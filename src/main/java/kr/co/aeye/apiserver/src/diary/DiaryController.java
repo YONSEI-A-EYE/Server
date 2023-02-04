@@ -36,7 +36,12 @@ public class DiaryController {
 
     @PostMapping
     public BaseResponse<PostDiaryRes> addDiary(@RequestBody PostDiaryReq postDiaryReq){
-        PostDiaryRes postDiaryRes = diaryService.addNewDiary(postDiaryReq);
+        PostDiaryRes postDiaryRes;
+        try {
+            postDiaryRes = diaryService.addNewDiary(postDiaryReq);
+        } catch (BaseException e){
+            return new BaseResponse<>(e.getStatus());
+        }
 
         return new BaseResponse<>(BaseResponseStatus.CREATED, postDiaryRes);
     }
