@@ -126,6 +126,20 @@ public class DiaryService {
                 .build();
     }
 
+    // diary 수정하기
+    public void updateDiaryService(int diaryId, UpdateDiaryReq updateDiaryReq) throws BaseException {
+        Optional<Diary> reqDiary = diaryRepository.findById(diaryId);
+        if (reqDiary.isEmpty()){
+            throw new BaseException(BaseResponseStatus.DIARY_NOT_FOUND);
+        }
+        Diary currDiary = reqDiary.get();
+
+        currDiary.setContent(updateDiaryReq.getContent());
+        currDiary.setEmotion(updateDiaryReq.getEmotion());
+
+        diaryRepository.save(currDiary);
+    }
+
     private Sentiment getEmotionFromGoogleCloud (String content) throws RuntimeException{
         /**
          * get sentiment(score, magnitude) from google cloud api

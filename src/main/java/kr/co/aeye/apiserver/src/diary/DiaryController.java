@@ -3,10 +3,7 @@ package kr.co.aeye.apiserver.src.diary;
 import kr.co.aeye.apiserver.config.BaseException;
 import kr.co.aeye.apiserver.config.BaseResponse;
 import kr.co.aeye.apiserver.config.BaseResponseStatus;
-import kr.co.aeye.apiserver.src.diary.model.GetMonthlyDiaryRes;
-import kr.co.aeye.apiserver.src.diary.model.GetTempDiaryRes;
-import kr.co.aeye.apiserver.src.diary.model.PostDiaryReq;
-import kr.co.aeye.apiserver.src.diary.model.PostDiaryRes;
+import kr.co.aeye.apiserver.src.diary.model.*;
 import kr.co.aeye.apiserver.src.diary.service.DiaryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,6 +40,16 @@ public class DiaryController {
         return new BaseResponse<>(BaseResponseStatus.SUCCESS, tempDiaryRes);
     }
 
+    @PatchMapping("/{diaryId}")
+    public BaseResponse<String> updateDiary(@PathVariable int diaryId, @RequestBody UpdateDiaryReq updateDiaryReq){
+        try{
+            diaryService.updateDiaryService(diaryId, updateDiaryReq);
+        } catch (BaseException e){
+            return new BaseResponse<>(e.getStatus());
+        }
+        return new BaseResponse<>(BaseResponseStatus.SUCCESS, "success");
+
+    }
 
     @PostMapping
     public BaseResponse<PostDiaryRes> addDiary(@RequestBody PostDiaryReq postDiaryReq){
@@ -55,7 +62,5 @@ public class DiaryController {
 
         return new BaseResponse<>(BaseResponseStatus.CREATED, postDiaryRes);
     }
-
-
 
 }
