@@ -1,7 +1,7 @@
 package kr.co.aeye.apiserver.src.diary;
 
 import jakarta.persistence.*;
-import kr.co.aeye.apiserver.src.user.User;
+import kr.co.aeye.apiserver.src.user.models.User;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;

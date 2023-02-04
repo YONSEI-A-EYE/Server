@@ -1,4 +1,4 @@
-package kr.co.aeye.apiserver.src.user;
+package kr.co.aeye.apiserver.src.user.models;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -25,7 +25,4 @@ public class User {
 
     @Column(nullable = true, length = 100)
     private String type;
-
-    @Column(nullable = true, length = 100)
-    private String test;
 }
