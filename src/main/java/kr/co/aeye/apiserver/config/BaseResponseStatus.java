@@ -10,7 +10,8 @@ public enum BaseResponseStatus {
     CREATED(true, 201, "create success"),
 
     // 400
-    BAD_REQUEST(false, 400, "bad_request");
+    BAD_REQUEST(false, 400, "bad request"),
+    USER_NOT_FOUND(false, 400, "user not found");
 
     private final boolean success;
     private final int code;
