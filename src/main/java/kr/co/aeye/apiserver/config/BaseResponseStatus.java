@@ -11,7 +11,9 @@ public enum BaseResponseStatus {
 
     // 400
     BAD_REQUEST(false, 400, "bad request"),
-    USER_NOT_FOUND(false, 400, "user not found");
+    USER_NOT_FOUND(false, 400, "user not found"),
+    DIARY_NOT_FOUND(false, 400, "diary not found");
+
 
     private final boolean success;
     private final int code;

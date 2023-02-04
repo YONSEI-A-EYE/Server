@@ -7,5 +7,5 @@ import lombok.*;
 @Data
 public class PostDiaryRes {
     private long diaryId;
-    private String emotion;
+    private String tempEmotion;
 }

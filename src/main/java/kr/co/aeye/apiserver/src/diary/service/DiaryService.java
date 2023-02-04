@@ -4,7 +4,9 @@ import kr.co.aeye.apiserver.config.BaseException;
 import kr.co.aeye.apiserver.config.BaseResponseStatus;
 import kr.co.aeye.apiserver.src.diary.DiaryRepository;
 import kr.co.aeye.apiserver.src.diary.model.Diary;
+import kr.co.aeye.apiserver.src.diary.model.GetTempDiaryRes;
 import kr.co.aeye.apiserver.src.diary.model.PostDiaryReq;
+import kr.co.aeye.apiserver.src.diary.model.PostDiaryRes;
 import kr.co.aeye.apiserver.src.user.UserRepository;
 import kr.co.aeye.apiserver.src.user.models.User;
 import lombok.extern.slf4j.Slf4j;
@@ -31,8 +33,23 @@ public class DiaryService {
         this.user = user.get();
     }
 
+    // diary 조회하기
+    public GetTempDiaryRes getDiaryById(int diaryId) throws BaseException{
+        Optional<Diary> reqDiary = diaryRepository.findById(diaryId);
+        if (reqDiary.isEmpty()){
+            throw new BaseException(BaseResponseStatus.DIARY_NOT_FOUND);
+        }
 
-    public Diary addNewDiary(PostDiaryReq postDiaryReq){
+        String tempEmotion = null;
+
+        return GetTempDiaryRes.builder()
+                .content(reqDiary.get().getContent())
+                .tempEmotion(tempEmotion)
+                .build();
+    }
+
+    // diary 추가하기
+    public PostDiaryRes addNewDiary(PostDiaryReq postDiaryReq){
         int year = postDiaryReq.getYear();
         int month = postDiaryReq.getMonth();
         int day = postDiaryReq.getDay();
@@ -46,6 +63,13 @@ public class DiaryService {
                 .build();
 
         diaryRepository.save(newDiary);
-        return newDiary;
+        log.info("post new diary. new diary = {}", newDiary);
+
+        String tempEmotion = null;
+
+        return PostDiaryRes.builder()
+                .diaryId(newDiary.getId())
+                .tempEmotion(tempEmotion)
+                .build();
     }
 }
