@@ -3,10 +3,7 @@ package kr.co.aeye.apiserver.src.diary.service;
 import kr.co.aeye.apiserver.config.BaseException;
 import kr.co.aeye.apiserver.config.BaseResponseStatus;
 import kr.co.aeye.apiserver.src.diary.DiaryRepository;
-import kr.co.aeye.apiserver.src.diary.model.Diary;
-import kr.co.aeye.apiserver.src.diary.model.GetTempDiaryRes;
-import kr.co.aeye.apiserver.src.diary.model.PostDiaryReq;
-import kr.co.aeye.apiserver.src.diary.model.PostDiaryRes;
+import kr.co.aeye.apiserver.src.diary.model.*;
 import kr.co.aeye.apiserver.src.user.UserRepository;
 import kr.co.aeye.apiserver.src.user.models.User;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.Optional;
+import java.util.*;
 
 import com.google.cloud.language.v1.Document;
 import com.google.cloud.language.v1.Document.Type;
@@ -56,8 +53,44 @@ public class DiaryService {
                 .build();
     }
 
+    // 월별 diary 조회하기
+    public TreeMap<Integer, GetMonthlyDiaryRes> getMonthlyDiary(int year, int month){
+        LocalDate firstDate = LocalDate.of(year, month, 1);
+        LocalDate lastDate = firstDate.withDayOfMonth(firstDate.lengthOfMonth());
+
+        List<Diary> diaryList = diaryRepository.findDiariesByDateBetween(firstDate, lastDate);
+        HashMap<Integer, Diary> diaryHashMap = new HashMap<>();
+        for (Diary diary : diaryList) {
+            int diaryDay = diary.getDate().getDayOfMonth();
+            diaryHashMap.put(diaryDay, diary);
+        }
+
+        HashMap<Integer, GetMonthlyDiaryRes> resHashMap = new HashMap<>();
+        for (int i = 1; i <= firstDate.lengthOfMonth(); i++){
+            Diary diary = diaryHashMap.get(i);
+            GetMonthlyDiaryRes diaryRes;
+            if (diary == null){
+                diaryRes = GetMonthlyDiaryRes.builder()
+                        .id(null)
+                        .emotion(null)
+                        .content(null)
+                        .build();
+            }
+            else{
+                 diaryRes = GetMonthlyDiaryRes.builder()
+                        .id(diary.getId())
+                        .emotion(diary.getEmotion())
+                        .content(diary.getContent())
+                        .build();
+            }
+            resHashMap.put(i, diaryRes);
+        }
+        TreeMap<Integer, GetMonthlyDiaryRes> result = new TreeMap<>(resHashMap);
+
+        return result;
+    }
+
     // diary 추가하기
-    // TODO: unique constraint
     public PostDiaryRes addNewDiary(PostDiaryReq postDiaryReq) throws BaseException {
         int year = postDiaryReq.getYear();
         int month = postDiaryReq.getMonth();
@@ -92,6 +125,7 @@ public class DiaryService {
                 .tempEmotion(tempEmotion)
                 .build();
     }
+
     private Sentiment getEmotionFromGoogleCloud (String content) throws RuntimeException{
         /**
          * get sentiment(score, magnitude) from google cloud api

@@ -17,4 +17,6 @@ public interface DiaryRepository extends JpaRepository<Diary, Integer> {
     Optional<Diary> findById(Integer integer);
 
     boolean existsDiaryByUserAndDate(User user, LocalDate dateTime);
+
+    List<Diary> findDiariesByDateBetween(LocalDate startDate, LocalDate endDate);
 }
