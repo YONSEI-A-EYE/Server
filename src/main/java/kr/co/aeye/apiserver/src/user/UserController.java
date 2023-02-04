@@ -1,5 +1,7 @@
 package kr.co.aeye.apiserver.src.user;
 
+import kr.co.aeye.apiserver.config.BaseResponse;
+import kr.co.aeye.apiserver.config.BaseResponseStatus;
 import kr.co.aeye.apiserver.src.user.models.PostUserSignup;
 import kr.co.aeye.apiserver.src.user.models.User;
 import lombok.RequiredArgsConstructor;
@@ -18,23 +20,28 @@ public class UserController {
     private final UserRepository userRepository;
 
     @GetMapping
-    public List<User> getAllUser(){
+    public BaseResponse<List<User>> getAllUser(){
         List<User> users = userRepository.findAll();
 
         log.info("find all users. users={}", users);
-        return users;
+        return new BaseResponse<>(BaseResponseStatus.SUCCESS, users);
     }
 
     @GetMapping("/{userId}")
-    public Optional<User> getUserById(@PathVariable int userId){
+    public BaseResponse<Optional<User>> getUserById(@PathVariable int userId){
         Optional<User> reqUser = userRepository.findById(userId);
-
-        log.info("find user by id. reqUser={}", reqUser);
-        return reqUser;
+        if (reqUser.isEmpty()){
+            log.info("No user id={}", userId);
+            return new BaseResponse<>(BaseResponseStatus.BAD_REQUEST);
+        }
+        else {
+            log.info("find user by id. reqUser={}", reqUser);
+            return new BaseResponse<>(BaseResponseStatus.SUCCESS, reqUser);
+        }
     }
 
     @PostMapping("/signup")
-    public User signUp (@RequestBody PostUserSignup postUserSignup){
+    public BaseResponse<User> signUp (@RequestBody PostUserSignup postUserSignup){
         User newUser = User.builder()
                 .name(postUserSignup.getName())
                 .email(postUserSignup.getEmail())
@@ -42,6 +49,8 @@ public class UserController {
                 .build();
 
         log.info("sign up new user. newUser={}", newUser);
-        return userRepository.save(newUser);
+        User savedUser = userRepository.save(newUser);
+
+        return new BaseResponse<>(BaseResponseStatus.CREATED, savedUser);
     }
 }
