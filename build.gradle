@@ -18,6 +18,8 @@ dependencies {
     runtimeOnly 'com.mysql:mysql-connector-j'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
+    implementation platform('com.google.cloud:libraries-bom:26.1.4')
+    implementation 'com.google.cloud:google-cloud-language'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 

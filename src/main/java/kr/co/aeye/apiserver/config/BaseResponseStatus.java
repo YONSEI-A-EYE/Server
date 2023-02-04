@@ -10,7 +10,11 @@ public enum BaseResponseStatus {
     CREATED(true, 201, "create success"),
 
     // 400
-    BAD_REQUEST(false, 400, "bad_request");
+    BAD_REQUEST(false, 400, "bad request"),
+    USER_NOT_FOUND(false, 400, "user not found"),
+    DIARY_NOT_FOUND(false, 400, "diary not found"),
+    DIARY_ALREADY_EXIST(false, 400, "diary duplicate error");
+
 
     private final boolean success;
     private final int code;
