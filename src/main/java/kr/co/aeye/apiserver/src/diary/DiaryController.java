@@ -3,14 +3,12 @@ package kr.co.aeye.apiserver.src.diary;
 import kr.co.aeye.apiserver.config.BaseException;
 import kr.co.aeye.apiserver.config.BaseResponse;
 import kr.co.aeye.apiserver.config.BaseResponseStatus;
-import kr.co.aeye.apiserver.src.diary.model.*;
 import kr.co.aeye.apiserver.src.diary.service.DiaryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import kr.co.aeye.apiserver.src.diary.model.*;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.TreeMap;
 
 @Slf4j

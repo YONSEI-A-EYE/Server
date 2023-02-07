@@ -7,6 +7,7 @@ import kr.co.aeye.apiserver.src.diary.model.*;
 import kr.co.aeye.apiserver.src.user.UserRepository;
 import kr.co.aeye.apiserver.src.user.models.User;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -24,16 +25,10 @@ public class DiaryService {
 
     private final DiaryRepository diaryRepository;
     private final UserRepository userRepository;
-    private User user;
 
-    public DiaryService(DiaryRepository diaryRepository, UserRepository userRepository) throws BaseException{
+    public DiaryService(DiaryRepository diaryRepository, UserRepository userRepository){
         this.diaryRepository = diaryRepository;
         this.userRepository = userRepository;
-        Optional<User> user = userRepository.findById(1);
-        if (user.isEmpty()){
-            throw new BaseException(BaseResponseStatus.USER_NOT_FOUND);
-        }
-        this.user = user.get();
     }
 
     // diary 조회하기 - emotion 저장 안된 diary
@@ -98,8 +93,14 @@ public class DiaryService {
 
         LocalDate postDate = LocalDate.of(year, month, day);
 
+        Optional<User> tempUser = userRepository.findById(1);
+        if (tempUser.isEmpty()){
+            throw new BaseException(BaseResponseStatus.USER_NOT_FOUND);
+        }
+        User user = tempUser.get();
+
         boolean isExist = diaryRepository.existsDiaryByUserAndDate(user, postDate);
-        if (diaryRepository.existsDiaryByUserAndDate(user, postDate)){
+        if (isExist){
             throw new BaseException(BaseResponseStatus.DIARY_ALREADY_EXIST);
         }
 
