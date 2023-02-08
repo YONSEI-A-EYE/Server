@@ -32,7 +32,7 @@ public class DiaryService {
     }
 
     // diary 조회하기 - emotion 저장 안된 diary
-    public GetTempDiaryRes getDiaryById(int diaryId) throws BaseException{
+    public GetUpdateDiaryRes getDiaryById(int diaryId) throws BaseException{
         Optional<Diary> reqDiary = diaryRepository.findById(diaryId);
         if (reqDiary.isEmpty()){
             throw new BaseException(BaseResponseStatus.DIARY_NOT_FOUND);
@@ -40,11 +40,13 @@ public class DiaryService {
         Diary currDiary = reqDiary.get();
 
         String tempEmotion = getTempEmotionFromScoreMagnitude(currDiary.getScore(), currDiary.getMagnitude());
-        log.info("tempEmotion={}", tempEmotion);
+        String emotion = currDiary.getEmotion();
+        log.info("retrieve diary edit page. diaryId={}", currDiary.getId());
 
-        return GetTempDiaryRes.builder()
+        return GetUpdateDiaryRes.builder()
                 .content(reqDiary.get().getContent())
                 .tempEmotion(tempEmotion)
+                .emotion(emotion)
                 .build();
     }
 
@@ -81,6 +83,7 @@ public class DiaryService {
             resHashMap.put(i, diaryRes);
         }
         TreeMap<Integer, GetMonthlyDiaryRes> result = new TreeMap<>(resHashMap);
+        log.info("retrieve {} diary edit page.", year + "/" + month);
 
         return result;
     }
@@ -119,7 +122,7 @@ public class DiaryService {
                 .build();
 
         diaryRepository.save(newDiary);
-        log.info("post new diary. new diary = {}", newDiary);
+        log.info("post new diary. new diary id = {}", newDiary.getId());
 
         return PostDiaryRes.builder()
                 .diaryId(newDiary.getId())
@@ -131,6 +134,7 @@ public class DiaryService {
     public void updateDiaryService(int diaryId, UpdateDiaryReq updateDiaryReq) throws BaseException {
         Optional<Diary> reqDiary = diaryRepository.findById(diaryId);
         if (reqDiary.isEmpty()){
+            log.error("update fail. wrong diary id. diary id = {}", diaryId);
             throw new BaseException(BaseResponseStatus.DIARY_NOT_FOUND);
         }
         Diary currDiary = reqDiary.get();
@@ -139,6 +143,7 @@ public class DiaryService {
         currDiary.setEmotion(updateDiaryReq.getEmotion());
 
         diaryRepository.save(currDiary);
+        log.info("update diary. diary id = {}", currDiary.getId());
     }
 
     private Sentiment getEmotionFromGoogleCloud (String content) throws RuntimeException{

@@ -27,15 +27,15 @@ public class DiaryController {
 
 
     @GetMapping("/{diaryId}")
-    public BaseResponse<GetTempDiaryRes> getDiary(@PathVariable int diaryId) {
-        GetTempDiaryRes tempDiaryRes;
+    public BaseResponse<GetUpdateDiaryRes> getDiary(@PathVariable int diaryId) {
+        GetUpdateDiaryRes updateDiaryRes;
         try {
-            tempDiaryRes = diaryService.getDiaryById(diaryId);
+            updateDiaryRes = diaryService.getDiaryById(diaryId);
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
         }
 
-        return new BaseResponse<>(BaseResponseStatus.SUCCESS, tempDiaryRes);
+        return new BaseResponse<>(BaseResponseStatus.SUCCESS, updateDiaryRes);
     }
 
     @PatchMapping("/{diaryId}")

@@ -7,7 +7,8 @@ import lombok.Getter;
 @Getter
 @Builder
 @Data
-public class GetTempDiaryRes {
+public class GetUpdateDiaryRes {
     private String content;
     private String tempEmotion;
+    private String emotion;
 }
