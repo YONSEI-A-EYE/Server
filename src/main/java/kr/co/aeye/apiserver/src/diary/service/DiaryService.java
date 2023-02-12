@@ -7,7 +7,6 @@ import kr.co.aeye.apiserver.src.diary.model.*;
 import kr.co.aeye.apiserver.src.user.UserRepository;
 import kr.co.aeye.apiserver.src.user.models.User;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -131,7 +130,7 @@ public class DiaryService {
     }
 
     // diary 수정하기
-    public String updateDiaryService(int diaryId, String type, UpdateDiaryReq updateDiaryReq) throws BaseException {
+    public UpdateDiaryRes updateDiaryService(int diaryId, String type, UpdateDiaryReq updateDiaryReq) throws BaseException {
         Optional<Diary> reqDiary = diaryRepository.findById(diaryId);
         if (reqDiary.isEmpty()){
             log.error("update fail. wrong diary id. diary id = {}", diaryId);
@@ -140,6 +139,7 @@ public class DiaryService {
         Diary currDiary = reqDiary.get();
 
         String tempEmotion;
+        UpdateDiaryRes res;
 
         switch (type){
             case "content":
@@ -157,11 +157,16 @@ public class DiaryService {
                 // update content
                 currDiary.setContent(content);
                 currDiary.setEmotion(null);
+                currDiary.setScore(sentiment.getScore());
+                currDiary.setMagnitude(sentiment.getMagnitude());
+
+                res = UpdateDiaryRes.builder().tempEmotion(tempEmotion).build();
                 break;
             case "emotion":
                 String emotion = updateDiaryReq.getEmotion();
                 currDiary.setEmotion(emotion);
                 tempEmotion = null;
+                res = null;
                 break;
             default:
                 throw new BaseException(BaseResponseStatus.BAD_REQUEST);
@@ -170,7 +175,7 @@ public class DiaryService {
         diaryRepository.save(currDiary);
         log.info("update diary. diary id = {}", currDiary.getId());
 
-        return tempEmotion;
+        return res;
     }
 
     private Sentiment getEmotionFromGoogleCloud (String content) throws RuntimeException{

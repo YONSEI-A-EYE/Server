@@ -42,17 +42,17 @@ public class DiaryController {
 
     // 감정일기 수정페이지 수정하기
     @PatchMapping("/{diaryId}")
-    public BaseResponse<String> updateDiary(
+    public BaseResponse<UpdateDiaryRes> updateDiary(
             @PathVariable int diaryId,
             @RequestParam String type,
             @RequestBody UpdateDiaryReq updateDiaryReq){
-        String tempEmotion;
+        UpdateDiaryRes updateDiaryres;
         try{
-            tempEmotion = diaryService.updateDiaryService(diaryId, type, updateDiaryReq);
+            updateDiaryres = diaryService.updateDiaryService(diaryId, type, updateDiaryReq);
         } catch (BaseException e){
             return new BaseResponse<>(e.getStatus());
         }
-        return new BaseResponse<>(BaseResponseStatus.SUCCESS, tempEmotion);
+        return new BaseResponse<>(BaseResponseStatus.SUCCESS, updateDiaryres);
 
     }
 
