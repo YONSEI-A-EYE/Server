@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import kr.co.aeye.apiserver.src.diary.model.*;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.TreeMap;
 
 @Slf4j
@@ -26,6 +27,7 @@ public class DiaryController {
     }
 
 
+    // 감정일기 수정페이지 조회하기
     @GetMapping("/{diaryId}")
     public BaseResponse<GetUpdateDiaryRes> getDiary(@PathVariable int diaryId) {
         GetUpdateDiaryRes updateDiaryRes;
@@ -38,19 +40,24 @@ public class DiaryController {
         return new BaseResponse<>(BaseResponseStatus.SUCCESS, updateDiaryRes);
     }
 
+    // 감정일기 수정페이지 수정하기
     @PatchMapping("/{diaryId}")
-    public BaseResponse<String> updateDiary(@PathVariable int diaryId, @RequestBody UpdateDiaryReq updateDiaryReq){
+    public BaseResponse<String> updateDiary(
+            @PathVariable int diaryId,
+            @RequestParam String type,
+            @RequestBody UpdateDiaryReq updateDiaryReq){
+        String tempEmotion;
         try{
-            diaryService.updateDiaryService(diaryId, updateDiaryReq);
+            tempEmotion = diaryService.updateDiaryService(diaryId, type, updateDiaryReq);
         } catch (BaseException e){
             return new BaseResponse<>(e.getStatus());
         }
-        return new BaseResponse<>(BaseResponseStatus.SUCCESS, "success");
+        return new BaseResponse<>(BaseResponseStatus.SUCCESS, tempEmotion);
 
     }
 
     @PostMapping
-    public BaseResponse<PostDiaryRes> addDiary(@RequestBody PostDiaryReq postDiaryReq){
+    public BaseResponse<PostDiaryRes> addDiary(@RequestBody PostDiaryReq postDiaryReq) {
         PostDiaryRes postDiaryRes;
         try {
             postDiaryRes = diaryService.addNewDiary(postDiaryReq);

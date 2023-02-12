@@ -131,7 +131,7 @@ public class DiaryService {
     }
 
     // diary 수정하기
-    public void updateDiaryService(int diaryId, UpdateDiaryReq updateDiaryReq) throws BaseException {
+    public String updateDiaryService(int diaryId, String type, UpdateDiaryReq updateDiaryReq) throws BaseException {
         Optional<Diary> reqDiary = diaryRepository.findById(diaryId);
         if (reqDiary.isEmpty()){
             log.error("update fail. wrong diary id. diary id = {}", diaryId);
@@ -139,11 +139,38 @@ public class DiaryService {
         }
         Diary currDiary = reqDiary.get();
 
-        currDiary.setContent(updateDiaryReq.getContent());
-        currDiary.setEmotion(updateDiaryReq.getEmotion());
+        String tempEmotion;
+
+        switch (type){
+            case "content":
+                // get content
+                String content = updateDiaryReq.getContent();
+                if (content == null){
+                    throw new BaseException(BaseResponseStatus.BAD_REQUEST);
+                }
+
+                // get sentiment from google api
+                Sentiment sentiment = getEmotionFromGoogleCloud(content);
+                tempEmotion = getTempEmotionFromScoreMagnitude(sentiment.getScore(), sentiment.getMagnitude());
+                log.info("tempEmotion={}", tempEmotion);
+
+                // update content
+                currDiary.setContent(content);
+                currDiary.setEmotion(null);
+                break;
+            case "emotion":
+                String emotion = updateDiaryReq.getEmotion();
+                currDiary.setEmotion(emotion);
+                tempEmotion = null;
+                break;
+            default:
+                throw new BaseException(BaseResponseStatus.BAD_REQUEST);
+        }
 
         diaryRepository.save(currDiary);
         log.info("update diary. diary id = {}", currDiary.getId());
+
+        return tempEmotion;
     }
 
     private Sentiment getEmotionFromGoogleCloud (String content) throws RuntimeException{
