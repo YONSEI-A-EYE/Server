@@ -9,8 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import kr.co.aeye.apiserver.src.diary.model.*;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
-import java.util.TreeMap;
+ import java.util.TreeMap;
 
 @Slf4j
 @RestController
@@ -29,7 +28,7 @@ public class DiaryController {
 
     // 감정일기 수정페이지 조회하기
     @GetMapping("/{diaryId}")
-    public BaseResponse<GetUpdateDiaryRes> getUpdateDiary(@PathVariable int diaryId) {
+    public BaseResponse<GetUpdateDiaryRes> getUpdateDiary(@PathVariable Long diaryId) {
         GetUpdateDiaryRes updateDiaryRes;
         try {
             updateDiaryRes = diaryService.getDiaryById(diaryId);
@@ -43,7 +42,7 @@ public class DiaryController {
     // 감정일기 수정페이지 수정하기
     @PatchMapping("/{diaryId}")
     public BaseResponse<UpdateDiaryRes> updateDiary(
-            @PathVariable int diaryId,
+            @PathVariable Long diaryId,
             @RequestParam String type,
             @RequestBody UpdateDiaryReq updateDiaryReq){
         UpdateDiaryRes updateDiaryres;
@@ -71,9 +70,14 @@ public class DiaryController {
 
     // 감정일기 결과 페이지
     @GetMapping("/result/{diaryId}")
-    public BaseResponse<ResultDiaryRes> getResultDiary(@PathVariable int diaryId){
+    public BaseResponse<ResultDiaryRes> getResultDiary(@PathVariable Long diaryId){
         ResultDiaryRes resultDiaryRes;
+        try{
+            resultDiaryRes = diaryService.getDiaryResultService(diaryId);
+        } catch (BaseException e){
+            return new BaseResponse<>(e.getStatus());
+        }
 
+        return new BaseResponse<>(BaseResponseStatus.SUCCESS, resultDiaryRes);
     }
-
 }

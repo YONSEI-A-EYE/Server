@@ -13,7 +13,8 @@ public enum BaseResponseStatus {
     BAD_REQUEST(false, 400, "bad request"),
     USER_NOT_FOUND(false, 400, "user not found"),
     DIARY_NOT_FOUND(false, 400, "diary not found"),
-    DIARY_ALREADY_EXIST(false, 400, "diary duplicate error");
+    DIARY_ALREADY_EXIST(false, 400, "diary duplicate error"),
+    WRONG_EMOTION(false, 400, "wrong emotion");
 
 
     private final boolean success;

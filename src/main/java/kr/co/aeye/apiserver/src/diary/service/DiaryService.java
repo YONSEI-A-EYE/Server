@@ -3,19 +3,14 @@ package kr.co.aeye.apiserver.src.diary.service;
 import kr.co.aeye.apiserver.config.BaseException;
 import kr.co.aeye.apiserver.config.BaseResponseStatus;
 import kr.co.aeye.apiserver.src.diary.DiaryRepository;
+import kr.co.aeye.apiserver.src.diary.EmotionResponse;
 import kr.co.aeye.apiserver.src.diary.model.*;
+import kr.co.aeye.apiserver.src.diary.utils.GetEmotionResponse;
 import kr.co.aeye.apiserver.src.diary.utils.GoogleEmotion;
 import kr.co.aeye.apiserver.src.user.UserRepository;
 import kr.co.aeye.apiserver.src.user.models.User;
 import lombok.extern.slf4j.Slf4j;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.springframework.stereotype.Service;
-
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
 import com.google.cloud.language.v1.Sentiment;
@@ -33,7 +28,7 @@ public class DiaryService {
     }
 
     // diary 조회하기 - emotion 저장 안된 diary
-    public GetUpdateDiaryRes getDiaryById(int diaryId) throws BaseException{
+    public GetUpdateDiaryRes getDiaryById(Long diaryId) throws BaseException{
         Optional<Diary> reqDiary = diaryRepository.findById(diaryId);
         if (reqDiary.isEmpty()){
             throw new BaseException(BaseResponseStatus.DIARY_NOT_FOUND);
@@ -132,7 +127,7 @@ public class DiaryService {
     }
 
     // diary 수정하기
-    public UpdateDiaryRes updateDiaryService(int diaryId, String type, UpdateDiaryReq updateDiaryReq) throws BaseException {
+    public UpdateDiaryRes updateDiaryService(Long diaryId, String type, UpdateDiaryReq updateDiaryReq) throws BaseException {
         Optional<Diary> reqDiary = diaryRepository.findById(diaryId);
         if (reqDiary.isEmpty()){
             log.error("update fail. wrong diary id. diary id = {}", diaryId);
@@ -181,28 +176,28 @@ public class DiaryService {
     }
 
     // diary result 페이지
-    public ResultDiaryRes getDiaryResultService(int diaryId) throws BaseException {
+    public ResultDiaryRes getDiaryResultService(Long diaryId) throws BaseException {
         Optional<Diary> reqDiary = diaryRepository.findById(diaryId);
         if (reqDiary.isEmpty()){
-            log.error("update fail. wrong diary id. diary id = {}", diaryId);
+            log.error("fail to find retrieve diary. diary id = {}", diaryId);
             throw new BaseException(BaseResponseStatus.DIARY_NOT_FOUND);
         }
         Diary currDiary = reqDiary.get();
 
-        try {
-            Object emotionDictObj = new JSONParser().parse(new FileReader("emotionResponse.json"));
-            JSONObject emotionDict = (JSONObject) emotionDictObj;
-
-        } catch (IOException e) {
-            log.error("error during find emotionResponse file");
-            throw new RuntimeException(e);
-        } catch (ParseException e) {
-            log.error("error during find emotionResponse file");
-            throw new RuntimeException(e);
-        }
-
         String emotion = currDiary.getEmotion();
+        String emotionText = GetEmotionResponse.getEmotionResponse(emotion);
 
+        LocalDate diaryDate = currDiary.getDate();
 
+        ResultDiaryRes res = ResultDiaryRes
+                .builder()
+                .year(diaryDate.getYear())
+                .month(diaryDate.getMonthValue())
+                .day(diaryDate.getDayOfMonth())
+                .emotion(emotion)
+                .emotionText(emotionText)
+                .build();
+
+        return res;
     }
 }

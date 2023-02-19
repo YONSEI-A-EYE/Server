@@ -12,7 +12,7 @@ import java.util.Optional;
 @Repository
 public interface DiaryRepository extends JpaRepository<Diary, Integer> {
     List<Diary> findAll();
-    Optional<Diary> findById(Integer integer);
+    Optional<Diary> findById(Long integer);
     boolean existsDiaryByUserAndDate(User user, LocalDate dateTime);
     List<Diary> findDiariesByDateBetween(LocalDate startDate, LocalDate endDate);
 }

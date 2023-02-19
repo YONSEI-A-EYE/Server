@@ -26,6 +26,10 @@ public class Diary {
     @JoinColumn(name="user")
     private User user;
 
+    @ManyToOne(optional = false)
+    @JoinColumn(name="video", nullable = true)
+    private Video video;
+
     @Column(nullable = false)
     private LocalDate date;
 

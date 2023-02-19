@@ -8,18 +8,12 @@ import lombok.Getter;
 @Builder
 @Data
 public class ResultDiaryRes {
-    private Date date;
-    private String emotion;
-    private String emotionText;
-    private Float sentimentLevel;
-    private String recommend;
-}
-
-@Getter
-@Builder
-@Data
-public class Date {
     private int year;
     private int month;
     private int day;
+    private String emotion;
+    private String emotionText;
+    private Float sentimentLevel;
+    private String title;
+    private String videoUrl;
 }
