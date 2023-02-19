@@ -48,4 +48,27 @@ public class GetEmotionResponse {
 
 
     }
+
+    public static String getThemeFromEmotion(String emotion) throws BaseException{
+        switch (emotion){
+            case "excited":
+            case "happy":
+            case "calm":
+            case "content":
+            case "anticipate":
+            case "goodSurprised":
+            case "relaxed":
+                return "positive";
+
+            case "tense":
+            case "angry":
+            case "sad":
+            case "badSurprised":
+            case "bored":
+            case "tired":
+                return "negative";
+            default:
+                throw new BaseException(BaseResponseStatus.WRONG_EMOTION);
+        }
+    }
 }

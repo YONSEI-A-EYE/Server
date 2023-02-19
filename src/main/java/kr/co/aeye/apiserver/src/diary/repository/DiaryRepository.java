@@ -1,4 +1,4 @@
-package kr.co.aeye.apiserver.src.diary;
+package kr.co.aeye.apiserver.src.diary.repository;
 
 import kr.co.aeye.apiserver.src.diary.model.Diary;
 import kr.co.aeye.apiserver.src.user.models.User;

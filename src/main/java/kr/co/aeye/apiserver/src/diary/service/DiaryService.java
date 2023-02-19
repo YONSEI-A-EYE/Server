@@ -2,10 +2,11 @@ package kr.co.aeye.apiserver.src.diary.service;
 
 import kr.co.aeye.apiserver.config.BaseException;
 import kr.co.aeye.apiserver.config.BaseResponseStatus;
-import kr.co.aeye.apiserver.src.diary.DiaryRepository;
-import kr.co.aeye.apiserver.src.diary.EmotionResponse;
+import kr.co.aeye.apiserver.src.diary.repository.DiaryRepository;
 import kr.co.aeye.apiserver.src.diary.model.*;
+import kr.co.aeye.apiserver.src.diary.repository.VideoRepository;
 import kr.co.aeye.apiserver.src.diary.utils.GetEmotionResponse;
+import kr.co.aeye.apiserver.src.diary.utils.GetSentimentLevel;
 import kr.co.aeye.apiserver.src.diary.utils.GoogleEmotion;
 import kr.co.aeye.apiserver.src.user.UserRepository;
 import kr.co.aeye.apiserver.src.user.models.User;
@@ -20,10 +21,12 @@ import com.google.cloud.language.v1.Sentiment;
 public class DiaryService {
 
     private final DiaryRepository diaryRepository;
+    private final VideoRepository videoRepository;
     private final UserRepository userRepository;
 
-    public DiaryService(DiaryRepository diaryRepository, UserRepository userRepository){
+    public DiaryService(DiaryRepository diaryRepository, VideoRepository videoRepository, UserRepository userRepository){
         this.diaryRepository = diaryRepository;
+        this.videoRepository = videoRepository;
         this.userRepository = userRepository;
     }
 
@@ -107,6 +110,9 @@ public class DiaryService {
         Sentiment sentiment = GoogleEmotion.getEmotionFromGoogleCloud(postDiaryReq.getContent());
         String tempEmotion = GoogleEmotion.getTempEmotionFromScoreMagnitude(sentiment.getScore(), sentiment.getMagnitude());
         log.info("tempEmotion={}", tempEmotion);
+        String theme = GetEmotionResponse.getThemeFromEmotion(tempEmotion);
+        Video newVideo = videoRepository.findVideoRandByTheme(theme);
+        log.info("newVideo={}", newVideo.getTitle());
 
         // save new Diary
         Diary newDiary = Diary.builder()
@@ -115,6 +121,7 @@ public class DiaryService {
                 .content(postDiaryReq.getContent())
                 .score(sentiment.getScore())
                 .magnitude(sentiment.getMagnitude())
+                .video(newVideo)
                 .build();
 
         diaryRepository.save(newDiary);
@@ -151,18 +158,23 @@ public class DiaryService {
                 tempEmotion = GoogleEmotion.getTempEmotionFromScoreMagnitude(sentiment.getScore(), sentiment.getMagnitude());
                 log.info("tempEmotion={}", tempEmotion);
 
+                // set video
+                String theme = GetEmotionResponse.getThemeFromEmotion(tempEmotion);
+                Video newVideo = videoRepository.findVideoRandByTheme(theme);
+                log.info("newVideo={}", newVideo);
+
                 // update content
                 currDiary.setContent(content);
                 currDiary.setEmotion(null);
                 currDiary.setScore(sentiment.getScore());
                 currDiary.setMagnitude(sentiment.getMagnitude());
+                currDiary.setVideo(newVideo);
 
                 res = UpdateDiaryRes.builder().tempEmotion(tempEmotion).build();
                 break;
             case "emotion":
                 String emotion = updateDiaryReq.getEmotion();
                 currDiary.setEmotion(emotion);
-                tempEmotion = null;
                 res = null;
                 break;
             default:
@@ -183,11 +195,20 @@ public class DiaryService {
             throw new BaseException(BaseResponseStatus.DIARY_NOT_FOUND);
         }
         Diary currDiary = reqDiary.get();
-
+        LocalDate diaryDate = currDiary.getDate();
         String emotion = currDiary.getEmotion();
         String emotionText = GetEmotionResponse.getEmotionResponse(emotion);
 
-        LocalDate diaryDate = currDiary.getDate();
+        float sentiment = GetSentimentLevel.getSentimentLevel(currDiary.getScore(), currDiary.getMagnitude());
+
+        if (currDiary.getVideo() == null){
+            String tempEmotion = GoogleEmotion.getTempEmotionFromScoreMagnitude(currDiary.getScore(), currDiary.getMagnitude());
+            String theme = GetEmotionResponse.getThemeFromEmotion(tempEmotion);
+            Video newVideo = videoRepository.findVideoRandByTheme(theme);
+            currDiary.setVideo(newVideo);
+            diaryRepository.save(currDiary);
+            log.info("save new Video during retrieve result. diaryId={}", currDiary.getId());
+        }
 
         ResultDiaryRes res = ResultDiaryRes
                 .builder()
@@ -196,6 +217,9 @@ public class DiaryService {
                 .day(diaryDate.getDayOfMonth())
                 .emotion(emotion)
                 .emotionText(emotionText)
+                .sentimentLevel(sentiment)
+                .title(currDiary.getVideo().getTitle())
+                .videoUrl(currDiary.getVideo().getVideoUrl())
                 .build();
 
         return res;
