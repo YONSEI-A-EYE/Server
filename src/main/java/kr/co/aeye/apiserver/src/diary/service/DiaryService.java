@@ -4,18 +4,20 @@ import kr.co.aeye.apiserver.config.BaseException;
 import kr.co.aeye.apiserver.config.BaseResponseStatus;
 import kr.co.aeye.apiserver.src.diary.DiaryRepository;
 import kr.co.aeye.apiserver.src.diary.model.*;
+import kr.co.aeye.apiserver.src.diary.utils.GoogleEmotion;
 import kr.co.aeye.apiserver.src.user.UserRepository;
 import kr.co.aeye.apiserver.src.user.models.User;
 import lombok.extern.slf4j.Slf4j;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.springframework.stereotype.Service;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
-
-import com.google.cloud.language.v1.Document;
-import com.google.cloud.language.v1.Document.Type;
-import com.google.cloud.language.v1.LanguageServiceClient;
 import com.google.cloud.language.v1.Sentiment;
 
 @Slf4j
@@ -38,7 +40,7 @@ public class DiaryService {
         }
         Diary currDiary = reqDiary.get();
 
-        String tempEmotion = getTempEmotionFromScoreMagnitude(currDiary.getScore(), currDiary.getMagnitude());
+        String tempEmotion = GoogleEmotion.getTempEmotionFromScoreMagnitude(currDiary.getScore(), currDiary.getMagnitude());
         String emotion = currDiary.getEmotion();
         log.info("retrieve diary edit page. diaryId={}", currDiary.getId());
 
@@ -107,8 +109,8 @@ public class DiaryService {
         }
 
         // get sentiment from google api
-        Sentiment sentiment = getEmotionFromGoogleCloud(postDiaryReq.getContent());
-        String tempEmotion = getTempEmotionFromScoreMagnitude(sentiment.getScore(), sentiment.getMagnitude());
+        Sentiment sentiment = GoogleEmotion.getEmotionFromGoogleCloud(postDiaryReq.getContent());
+        String tempEmotion = GoogleEmotion.getTempEmotionFromScoreMagnitude(sentiment.getScore(), sentiment.getMagnitude());
         log.info("tempEmotion={}", tempEmotion);
 
         // save new Diary
@@ -150,8 +152,8 @@ public class DiaryService {
                 }
 
                 // get sentiment from google api
-                Sentiment sentiment = getEmotionFromGoogleCloud(content);
-                tempEmotion = getTempEmotionFromScoreMagnitude(sentiment.getScore(), sentiment.getMagnitude());
+                Sentiment sentiment = GoogleEmotion.getEmotionFromGoogleCloud(content);
+                tempEmotion = GoogleEmotion.getTempEmotionFromScoreMagnitude(sentiment.getScore(), sentiment.getMagnitude());
                 log.info("tempEmotion={}", tempEmotion);
 
                 // update content
@@ -178,63 +180,29 @@ public class DiaryService {
         return res;
     }
 
-    private Sentiment getEmotionFromGoogleCloud (String content) throws RuntimeException{
-        /**
-         * get sentiment(score, magnitude) from google cloud api
-         */
-        // Instantiates a client
-        LanguageServiceClient language;
+    // diary result 페이지
+    public ResultDiaryRes getDiaryResultService(int diaryId) throws BaseException {
+        Optional<Diary> reqDiary = diaryRepository.findById(diaryId);
+        if (reqDiary.isEmpty()){
+            log.error("update fail. wrong diary id. diary id = {}", diaryId);
+            throw new BaseException(BaseResponseStatus.DIARY_NOT_FOUND);
+        }
+        Diary currDiary = reqDiary.get();
+
         try {
-            language = LanguageServiceClient.create();
+            Object emotionDictObj = new JSONParser().parse(new FileReader("emotionResponse.json"));
+            JSONObject emotionDict = (JSONObject) emotionDictObj;
+
         } catch (IOException e) {
+            log.error("error during find emotionResponse file");
+            throw new RuntimeException(e);
+        } catch (ParseException e) {
+            log.error("error during find emotionResponse file");
             throw new RuntimeException(e);
         }
 
-        // The text to analyze
-        Document doc = Document.newBuilder().setContent(content).setType(Type.PLAIN_TEXT).build();
+        String emotion = currDiary.getEmotion();
 
-        // Detects the sentiment of the text
-        return language.analyzeSentiment(doc).getDocumentSentiment();
-    }
 
-    private String getTempEmotionFromScoreMagnitude(float score, float magnitude) {
-        /**
-         * convert score, magnitude to emotion
-         */
-        if (score > 0.5) {
-            if (magnitude >= 0.75) {
-                return "excited";
-            } else if (magnitude > 0.5) {
-                return "happy";
-            } else if (magnitude > 0.25) {
-                return "content";
-            } else {
-                return "relaxed";
-            }
-        } else if (score > 0.1) {
-            if (magnitude > 0.25) {
-                return "goodSurprised";
-            } else {
-                return "calm";
-            }
-        } else if (score >= -0.1) {
-            return "anticipate";
-        } else if (score >= -0.5) {
-            if (magnitude > 0.25) {
-                return "badSurprised";
-            } else {
-                return "tired";
-            }
-        } else {
-            if (magnitude >= 0.75) {
-                return "tense";
-            } else if (magnitude > 0.5) {
-                return "angry";
-            } else if (magnitude > 0.25) {
-                return "sad";
-            } else {
-                return "bored";
-            }
-        }
     }
 }

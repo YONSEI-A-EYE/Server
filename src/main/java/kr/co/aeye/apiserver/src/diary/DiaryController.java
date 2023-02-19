@@ -29,7 +29,7 @@ public class DiaryController {
 
     // 감정일기 수정페이지 조회하기
     @GetMapping("/{diaryId}")
-    public BaseResponse<GetUpdateDiaryRes> getDiary(@PathVariable int diaryId) {
+    public BaseResponse<GetUpdateDiaryRes> getUpdateDiary(@PathVariable int diaryId) {
         GetUpdateDiaryRes updateDiaryRes;
         try {
             updateDiaryRes = diaryService.getDiaryById(diaryId);
@@ -56,6 +56,7 @@ public class DiaryController {
 
     }
 
+    // 감정일기 추가
     @PostMapping
     public BaseResponse<PostDiaryRes> addDiary(@RequestBody PostDiaryReq postDiaryReq) {
         PostDiaryRes postDiaryRes;
@@ -66,6 +67,13 @@ public class DiaryController {
         }
 
         return new BaseResponse<>(BaseResponseStatus.CREATED, postDiaryRes);
+    }
+
+    // 감정일기 결과 페이지
+    @GetMapping("/result/{diaryId}")
+    public BaseResponse<ResultDiaryRes> getResultDiary(@PathVariable int diaryId){
+        ResultDiaryRes resultDiaryRes;
+
     }
 
 }
