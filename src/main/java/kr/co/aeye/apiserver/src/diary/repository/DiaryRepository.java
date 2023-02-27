@@ -1,8 +1,10 @@
 package kr.co.aeye.apiserver.src.diary.repository;
 
 import kr.co.aeye.apiserver.src.diary.model.Diary;
+import kr.co.aeye.apiserver.src.diary.model.diaryReport.EmotionHistogram;
 import kr.co.aeye.apiserver.src.user.models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
@@ -15,4 +17,7 @@ public interface DiaryRepository extends JpaRepository<Diary, Integer> {
     Optional<Diary> findById(Long integer);
     boolean existsDiaryByUserAndDate(User user, LocalDate dateTime);
     List<Diary> findDiariesByDateBetween(LocalDate startDate, LocalDate endDate);
+
+    @Query(name="find_emotion_histogram", nativeQuery = true)
+    EmotionHistogram getEmotionHistogramByDateBetween(LocalDate startDate, LocalDate endDate);
 }

@@ -1,11 +1,16 @@
 package kr.co.aeye.apiserver.src.diary.service;
 
+import jakarta.persistence.Tuple;
 import kr.co.aeye.apiserver.config.BaseException;
 import kr.co.aeye.apiserver.config.BaseResponseStatus;
+import kr.co.aeye.apiserver.src.diary.model.diaryReport.EmotionHistogram;
+import kr.co.aeye.apiserver.src.diary.model.diaryReport.MonthlyEmotion;
+import kr.co.aeye.apiserver.src.diary.model.diaryReport.SentimentLevel;
 import kr.co.aeye.apiserver.src.diary.repository.DiaryRepository;
 import kr.co.aeye.apiserver.src.diary.model.*;
 import kr.co.aeye.apiserver.src.diary.repository.VideoRepository;
 import kr.co.aeye.apiserver.src.diary.utils.GetEmotionResponse;
+import kr.co.aeye.apiserver.src.diary.utils.GetMonthlySentimentLevel;
 import kr.co.aeye.apiserver.src.diary.utils.GetSentimentLevel;
 import kr.co.aeye.apiserver.src.diary.utils.GoogleEmotion;
 import kr.co.aeye.apiserver.src.user.UserRepository;
@@ -223,5 +228,28 @@ public class DiaryService {
                 .build();
 
         return res;
+    }
+
+    //diary monthly report 페이지
+    public GetMonthlyReportRes getDiaryMonthlyReportService(int year, int month) throws BaseException{
+        LocalDate firstDate = LocalDate.of(year, month, 1);
+        LocalDate lastDate = firstDate.withDayOfMonth(firstDate.lengthOfMonth());
+
+        EmotionHistogram emotionHistogram = diaryRepository.getEmotionHistogramByDateBetween(firstDate, lastDate);
+        log.info("emotionHistogram ={}", emotionHistogram);
+        List<Diary> diaryList = diaryRepository.findDiariesByDateBetween(firstDate, lastDate);
+        log.info("diaryList ={}", diaryList);
+        SentimentLevel sentimentLevel = GetMonthlySentimentLevel.getMonthlySentimentLevel(diaryList);
+        String mostFrequentEmotion = emotionHistogram.getMostFrequentEmotion();
+        log.info("emotionHistogram ={}", emotionHistogram);
+        String emotionText = GetEmotionResponse.getEmotionResponse(mostFrequentEmotion);
+        MonthlyEmotion monthlyEmotion = MonthlyEmotion.builder().emotion(mostFrequentEmotion).comment(emotionText).build();
+
+        return GetMonthlyReportRes
+                .builder()
+                .sentimentLevel(sentimentLevel)
+                .emotionHistogram(emotionHistogram)
+                .monthlyEmotion(monthlyEmotion)
+                .build();
     }
 }

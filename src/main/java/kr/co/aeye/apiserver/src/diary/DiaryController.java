@@ -80,4 +80,17 @@ public class DiaryController {
 
         return new BaseResponse<>(BaseResponseStatus.SUCCESS, resultDiaryRes);
     }
+
+    // 감정일기 월별 레포트 페이지
+    @GetMapping("/report")
+    public BaseResponse<GetMonthlyReportRes> getMonthlyReport(@RequestParam int year, int month){
+        GetMonthlyReportRes getMonthlyReportRes;
+        try{
+            getMonthlyReportRes = diaryService.getDiaryMonthlyReportService(year, month);
+        } catch (BaseException e){
+            return new BaseResponse<>(e.getStatus());
+        }
+
+        return new BaseResponse<>(BaseResponseStatus.SUCCESS, getMonthlyReportRes);
+    }
 }
