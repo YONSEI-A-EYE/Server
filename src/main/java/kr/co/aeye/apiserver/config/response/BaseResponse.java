@@ -1,6 +1,5 @@
-package kr.co.aeye.apiserver.config;
+package kr.co.aeye.apiserver.config.response;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.AllArgsConstructor;

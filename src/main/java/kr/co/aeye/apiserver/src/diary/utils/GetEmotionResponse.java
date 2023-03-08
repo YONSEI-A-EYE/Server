@@ -1,7 +1,7 @@
 package kr.co.aeye.apiserver.src.diary.utils;
 
-import kr.co.aeye.apiserver.config.BaseException;
-import kr.co.aeye.apiserver.config.BaseResponseStatus;
+import kr.co.aeye.apiserver.config.response.BaseException;
+import kr.co.aeye.apiserver.config.response.BaseResponseStatus;
 import kr.co.aeye.apiserver.src.diary.EmotionResponse;
 import lombok.Getter;
 import lombok.Setter;

@@ -1,4 +1,4 @@
-package kr.co.aeye.apiserver.config;
+package kr.co.aeye.apiserver.config.response;
 
 import lombok.Getter;
 

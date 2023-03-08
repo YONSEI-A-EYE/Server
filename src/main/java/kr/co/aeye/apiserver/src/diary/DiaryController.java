@@ -1,8 +1,8 @@
 package kr.co.aeye.apiserver.src.diary;
 
-import kr.co.aeye.apiserver.config.BaseException;
-import kr.co.aeye.apiserver.config.BaseResponse;
-import kr.co.aeye.apiserver.config.BaseResponseStatus;
+import kr.co.aeye.apiserver.config.response.BaseException;
+import kr.co.aeye.apiserver.config.response.BaseResponse;
+import kr.co.aeye.apiserver.config.response.BaseResponseStatus;
 import kr.co.aeye.apiserver.src.diary.service.DiaryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

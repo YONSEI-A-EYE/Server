@@ -1,7 +1,7 @@
 package kr.co.aeye.apiserver.src.user;
 
-import kr.co.aeye.apiserver.config.BaseResponse;
-import kr.co.aeye.apiserver.config.BaseResponseStatus;
+import kr.co.aeye.apiserver.config.response.BaseResponse;
+import kr.co.aeye.apiserver.config.response.BaseResponseStatus;
 import kr.co.aeye.apiserver.src.user.models.PostUserSignup;
 import kr.co.aeye.apiserver.src.user.models.User;
 import lombok.RequiredArgsConstructor;

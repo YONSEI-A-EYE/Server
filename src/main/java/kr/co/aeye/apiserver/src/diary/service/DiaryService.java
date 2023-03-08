@@ -1,8 +1,7 @@
 package kr.co.aeye.apiserver.src.diary.service;
 
-import jakarta.persistence.Tuple;
-import kr.co.aeye.apiserver.config.BaseException;
-import kr.co.aeye.apiserver.config.BaseResponseStatus;
+import kr.co.aeye.apiserver.config.response.BaseException;
+import kr.co.aeye.apiserver.config.response.BaseResponseStatus;
 import kr.co.aeye.apiserver.src.diary.model.diaryReport.EmotionHistogram;
 import kr.co.aeye.apiserver.src.diary.model.diaryReport.MonthlyEmotion;
 import kr.co.aeye.apiserver.src.diary.model.diaryReport.SentimentLevel;
