@@ -1,5 +1,6 @@
 package kr.co.aeye.apiserver.api.user;
 
+import kr.co.aeye.apiserver.api.user.repository.UserRepository;
 import kr.co.aeye.apiserver.common.BaseResponse;
 import kr.co.aeye.apiserver.common.BaseResponseStatus;
 import kr.co.aeye.apiserver.api.user.dto.PostUserSignup;
