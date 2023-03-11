@@ -1,4 +1,4 @@
-package kr.co.aeye.apiserver.api.user;
+package kr.co.aeye.apiserver.api.user.repository;
 
 import kr.co.aeye.apiserver.api.user.entity.User;
 import org.springframework.data.repository.CrudRepository;
@@ -11,5 +11,5 @@ import java.util.Optional;
 public interface UserRepository extends CrudRepository<User, Integer> {
 
     List<User> findAll();
-    Optional<User> findById(Integer integer);
+    Optional<User> findById(Long id);
 }

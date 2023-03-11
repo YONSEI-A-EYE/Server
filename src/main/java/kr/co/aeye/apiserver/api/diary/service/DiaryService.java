@@ -14,7 +14,7 @@ import kr.co.aeye.apiserver.api.diary.utils.GetEmotionResponse;
 import kr.co.aeye.apiserver.api.diary.utils.GetMonthlySentimentLevel;
 import kr.co.aeye.apiserver.api.diary.utils.GetSentimentLevel;
 import kr.co.aeye.apiserver.api.diary.utils.GoogleEmotion;
-import kr.co.aeye.apiserver.api.user.UserRepository;
+import kr.co.aeye.apiserver.api.user.repository.UserRepository;
 import kr.co.aeye.apiserver.api.user.entity.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

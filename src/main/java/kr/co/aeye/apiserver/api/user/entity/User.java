@@ -27,7 +27,6 @@ public class User {
     @Column(nullable = false, length = 100)
     private String password;
 
-
     @Column(name = "ROLE_TYPE", length = 20, nullable = false)
     @Enumerated(EnumType.STRING)
     private RoleType roleType;
