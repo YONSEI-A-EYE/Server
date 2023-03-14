@@ -12,7 +12,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 //import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 
@@ -21,7 +23,7 @@ import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterN
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class AuthSuccessHandler implements AuthenticationSuccessHandler {
+public class AuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     /*
     login success
@@ -47,16 +49,11 @@ public class AuthSuccessHandler implements AuthenticationSuccessHandler {
         TokenDto token = tokenProvider.generateTokenDto(authentication);
         log.info("token={}", token);
 
-        int cookieMaxAge = (int) tokenProvider.REFRESH_TOKEN_EXPIRE_TIME / 60;
+        String targetUrl = UriComponentsBuilder.fromUriString("/login-success")
+                .queryParam("access", token.getAccessToken())
+                .queryParam("refresh", token.getRefreshToken())
+                .build().toUriString();
 
-        CookieUtil.deleteCookie(request, response, REFRESH_TOKEN);
-        CookieUtil.addCookie(response, REFRESH_TOKEN, token.getRefreshToken(), cookieMaxAge);
-
-        response.addHeader("Authorization", "Bearer " + token.getAccessToken());
-        response.setContentType("application/json;charset=UTF-8");
-
-        var writer = response.getWriter();
-        writer.println(objectMapper.writeValueAsString(token));
-        writer.flush();
+        getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }
 }

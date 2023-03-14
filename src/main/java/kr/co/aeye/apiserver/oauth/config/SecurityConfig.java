@@ -39,6 +39,7 @@ public class SecurityConfig {
                 .formLogin().disable()
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/").permitAll()
+                        .requestMatchers("/login-success").permitAll()
                         .requestMatchers("/favicon.ico").permitAll()
                         .anyRequest().authenticated()
                 )
@@ -48,13 +49,10 @@ public class SecurityConfig {
                     .authorizationEndpoint()
                     .baseUri("/oauth2/authorization")
                 .and()
+                    .successHandler(authSuccessHandler)
                     .userInfoEndpoint()
-                    .userService(customOAuth2UserService)
-                .and()
-                    .redirectionEndpoint()
-                    .baseUri("/*/oauth2/code/*")
-                .and()
-                    .successHandler(authSuccessHandler);
+                    .userService(customOAuth2UserService);
+
         return http.build();
     }
 
