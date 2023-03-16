@@ -1,4 +1,4 @@
-package kr.co.aeye.apiserver.oauth.config;
+package kr.co.aeye.apiserver.jwt.config;
 
 import kr.co.aeye.apiserver.jwt.filter.JwtFilter;
 import kr.co.aeye.apiserver.jwt.tokens.TokenProvider;

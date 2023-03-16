@@ -1,8 +1,8 @@
-package kr.co.aeye.apiserver.oauth.service;
+package kr.co.aeye.apiserver.auth.service;
 
 import kr.co.aeye.apiserver.api.user.entity.RoleType;
 import kr.co.aeye.apiserver.api.user.entity.User;
-import kr.co.aeye.apiserver.oauth.attributes.OAuthAttributes;
+import kr.co.aeye.apiserver.auth.attributes.OAuthAttributes;
 import lombok.RequiredArgsConstructor;
 import kr.co.aeye.apiserver.api.user.repository.UserRepository;
 

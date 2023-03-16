@@ -1,4 +1,4 @@
-package kr.co.aeye.apiserver.oauth.attributes;
+package kr.co.aeye.apiserver.auth.attributes;
 
 import kr.co.aeye.apiserver.api.user.entity.RoleType;
 import kr.co.aeye.apiserver.api.user.entity.User;

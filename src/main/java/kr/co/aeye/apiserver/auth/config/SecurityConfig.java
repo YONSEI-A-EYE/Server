@@ -1,7 +1,7 @@
-package kr.co.aeye.apiserver.oauth.config;
+package kr.co.aeye.apiserver.auth.config;
 
-import kr.co.aeye.apiserver.oauth.handler.AuthSuccessHandler;
-import kr.co.aeye.apiserver.oauth.service.CustomOAuth2UserService;
+import kr.co.aeye.apiserver.jwt.config.JwtSecurityConfig;
+import kr.co.aeye.apiserver.auth.service.CustomOAuth2UserService;
 import kr.co.aeye.apiserver.jwt.tokens.TokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,9 +19,6 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 @Slf4j
 public class SecurityConfig {
-
-    private final CustomOAuth2UserService customOAuth2UserService;
-    private final AuthSuccessHandler authSuccessHandler;
     private final TokenProvider tokenProvider;
 
     @Bean
@@ -29,29 +26,24 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-
     @Bean
     protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
         http
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .csrf().disable()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .formLogin().disable()
+                .apply(new JwtSecurityConfig(tokenProvider))
+                    .and()
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/").permitAll()
-                        .requestMatchers("/login-success").permitAll()
+                        .requestMatchers("/auth/login").permitAll()
+                        .requestMatchers("/auth/signup").permitAll()
                         .requestMatchers("/favicon.ico").permitAll()
                         .anyRequest().authenticated()
-                )
-                .apply(new JwtSecurityConfig(tokenProvider))
-                .and()
-                    .oauth2Login()
-                    .authorizationEndpoint()
-                    .baseUri("/oauth2/authorization")
-                .and()
-                    .successHandler(authSuccessHandler)
-                    .userInfoEndpoint()
-                    .userService(customOAuth2UserService);
+                );
+
+        http.logout()
+                .deleteCookies("JSESSIONID");
 
         return http.build();
     }

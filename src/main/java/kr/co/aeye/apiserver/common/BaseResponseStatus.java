@@ -14,7 +14,11 @@ public enum BaseResponseStatus {
     USER_NOT_FOUND(false, 400, "user not found"),
     DIARY_NOT_FOUND(false, 400, "diary not found"),
     DIARY_ALREADY_EXIST(false, 400, "diary duplicate error"),
-    WRONG_EMOTION(false, 400, "wrong emotion");
+    WRONG_EMOTION(false, 400, "wrong emotion"),
+    //401
+    WRONG_PASSWORD(false, 401, "wrong password"),
+    WRONG_EMAIL(false, 401, "wrong email");
+
 
 
     private final boolean success;
