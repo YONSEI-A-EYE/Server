@@ -1,16 +1,17 @@
 package kr.co.aeye.apiserver.auth.controller;
 
+import kr.co.aeye.apiserver.api.user.dto.PostUserSignup;
+import kr.co.aeye.apiserver.api.user.entity.User;
 import kr.co.aeye.apiserver.auth.dto.PostLoginFailRes;
 import kr.co.aeye.apiserver.auth.dto.PostLoginReq;
 import kr.co.aeye.apiserver.auth.service.AuthService;
 import kr.co.aeye.apiserver.common.BaseException;
+import kr.co.aeye.apiserver.common.BaseResponse;
+import kr.co.aeye.apiserver.common.BaseResponseStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 @Slf4j
@@ -36,5 +37,15 @@ public class AuthController {
         return loginResponse;
     }
 
+    @PostMapping("/signup")
+    public BaseResponse<Boolean> signUp (@RequestBody PostUserSignup postUserSignup){
+        Boolean isSuccess;
+        try {
+            isSuccess = authService.signUp(postUserSignup);
+        } catch (BaseException e){
+            return new BaseResponse<>(e.getStatus());
+        }
 
+        return new BaseResponse<>(BaseResponseStatus.CREATED, isSuccess);
+    }
 }

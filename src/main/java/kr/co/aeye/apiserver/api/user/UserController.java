@@ -3,7 +3,6 @@ package kr.co.aeye.apiserver.api.user;
 import kr.co.aeye.apiserver.api.user.repository.UserRepository;
 import kr.co.aeye.apiserver.common.BaseResponse;
 import kr.co.aeye.apiserver.common.BaseResponseStatus;
-import kr.co.aeye.apiserver.api.user.dto.PostUserSignup;
 import kr.co.aeye.apiserver.api.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,19 +38,5 @@ public class UserController {
             log.info("find user by id. reqUser={}", reqUser);
             return new BaseResponse<>(BaseResponseStatus.SUCCESS, reqUser);
         }
-    }
-
-    @PostMapping("/signup")
-    public BaseResponse<User> signUp (@RequestBody PostUserSignup postUserSignup){
-        User newUser = User.builder()
-                .name(postUserSignup.getName())
-                .email(postUserSignup.getEmail())
-                .password(postUserSignup.getPassword())
-                .build();
-
-        log.info("sign up new user. newUser={}", newUser);
-        User savedUser = userRepository.save(newUser);
-
-        return new BaseResponse<>(BaseResponseStatus.CREATED, savedUser);
     }
 }

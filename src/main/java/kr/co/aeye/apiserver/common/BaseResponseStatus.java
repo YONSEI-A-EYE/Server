@@ -15,6 +15,7 @@ public enum BaseResponseStatus {
     DIARY_NOT_FOUND(false, 400, "diary not found"),
     DIARY_ALREADY_EXIST(false, 400, "diary duplicate error"),
     WRONG_EMOTION(false, 400, "wrong emotion"),
+    ALREADY_EXIST_EMAIL(false, 400, "already exist email"),
     //401
     WRONG_PASSWORD(false, 401, "wrong password"),
     WRONG_EMAIL(false, 401, "wrong email");

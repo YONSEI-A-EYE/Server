@@ -28,7 +28,7 @@ public class User {
     @Column(length = 100, columnDefinition = "default integer 1")
     private String name;
 
-    @Column(length = 100)
+    @Column(length = 100, nullable = false)
     private String password;
 
     @Column(name = "ROLE_TYPE", length = 20, nullable = false)
