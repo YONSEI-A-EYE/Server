@@ -1,5 +1,6 @@
 package kr.co.aeye.apiserver.auth.controller;
 
+import kr.co.aeye.apiserver.auth.dto.PostLoginFailRes;
 import kr.co.aeye.apiserver.auth.dto.PostLoginReq;
 import kr.co.aeye.apiserver.auth.service.AuthService;
 import kr.co.aeye.apiserver.common.BaseException;
@@ -25,7 +26,11 @@ public class AuthController {
         try {
             loginResponse = authService.login(postLoginReq);
         } catch (BaseException e){
-            return ResponseEntity.status(401).body(e.getMessage());
+            PostLoginFailRes postLoginFailRes = PostLoginFailRes.builder()
+                    .success(false)
+                    .message(e.getStatus().toString())
+                    .build();
+            return ResponseEntity.status(401).body(postLoginFailRes);
         }
 
         return loginResponse;
