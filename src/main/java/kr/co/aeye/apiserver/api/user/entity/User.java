@@ -5,10 +5,8 @@ import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import org.springframework.security.core.GrantedAuthority;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 
 @Getter
 @Setter
@@ -42,10 +40,7 @@ public class User {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    public User update(String email, String name) {
-        this.email = email;
-        this.name = name;
-
-        return this;
+    public RoleType getAuthority(){
+        return this.roleType;
     }
 }

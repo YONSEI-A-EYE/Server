@@ -11,8 +11,14 @@ import kr.co.aeye.apiserver.common.BaseException;
 import kr.co.aeye.apiserver.common.BaseResponseStatus;
 import kr.co.aeye.apiserver.jwt.tokens.TokenDto;
 import kr.co.aeye.apiserver.jwt.tokens.TokenProvider;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -21,28 +27,34 @@ import static org.springframework.http.HttpHeaders.SET_COOKIE;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class AuthService {
 
     private final UserRepository userRepository;
     private final TokenProvider tokenProvider;
+    private final AuthenticationManagerBuilder authenticationManagerBuilder;
+    private final PasswordEncoder passwordEncoder;
 
-    public AuthService(UserRepository userRepository, TokenProvider tokenProvider){
-        this.userRepository = userRepository;
-        this.tokenProvider = tokenProvider;
-    }
 
     // login
     public ResponseEntity login(PostLoginReq postLoginReq) throws BaseException{
-        Optional<User> tempReqUser = userRepository.findByEmail(postLoginReq.getEmail());
-        if (tempReqUser.isEmpty()){
-            throw new BaseException(BaseResponseStatus.WRONG_EMAIL);
-        }
-        User reqUser = tempReqUser.get();
+        Authentication authentication;
+        RoleType roleType = null;
+        try{
+            Optional<User> tempUser = userRepository.findByEmail(postLoginReq.getEmail());
+            if (tempUser.isPresent()){
+                User user = tempUser.get();
+                roleType = user.getRoleType();
+            }
 
-        if (!reqUser.getPassword().equals(postLoginReq.getPassword())){
-            throw new BaseException(BaseResponseStatus.WRONG_PASSWORD);
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(postLoginReq.getEmail(), postLoginReq.getPassword());
+            authenticationToken.setDetails(roleType);
+            authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+        } catch (BadCredentialsException e){
+            throw new BaseException(BaseResponseStatus.WRONG_CREDENTIAL);
         }
-        TokenDto tokenDto = tokenProvider.generateTokenDto(reqUser);
+
+        TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
         PostLoginRes postLoginRes = PostLoginRes.builder()
                 .accessToken("Bearer " + tokenDto.getAccessToken())
                 .build();
@@ -62,10 +74,12 @@ public class AuthService {
         if (!reqUser.isEmpty()){
             throw new BaseException(BaseResponseStatus.ALREADY_EXIST_EMAIL);
         }
+
+        String password = passwordEncoder.encode(postUserSignup.getPassword());
         User newUser = User.builder()
                 .name(postUserSignup.getName())
                 .email(postUserSignup.getEmail())
-                .password(postUserSignup.getPassword())
+                .password(password)
                 .roleType(RoleType.USER)
                 .build();
 

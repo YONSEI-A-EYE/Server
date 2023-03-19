@@ -28,11 +28,13 @@ public class JwtFilter extends GenericFilterBean {
             throws IOException, ServletException {
 
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;
-        String jwt = resolveToken(httpServletRequest);
+        String accessToken = resolveToken(httpServletRequest);
         String requestURI = httpServletRequest.getRequestURI();
-        if(StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)){
-            log.info("jwt={}", jwt);
+        if(StringUtils.hasText(accessToken) && tokenProvider.validateToken(accessToken)){
+            log.info("jwt={}", accessToken);
             log.info("requestURI={}", requestURI);
+            Authentication authentication = tokenProvider.getAuthentication(accessToken);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
         }else{
             log.info("유효한 JWT 토큰이 없습니다., uri: {}", requestURI);
         }

@@ -17,6 +17,7 @@ public enum BaseResponseStatus {
     WRONG_EMOTION(false, 400, "wrong emotion"),
     ALREADY_EXIST_EMAIL(false, 400, "already exist email"),
     //401
+    WRONG_CREDENTIAL(false, 401, "login fail"),
     WRONG_PASSWORD(false, 401, "wrong password"),
     WRONG_EMAIL(false, 401, "wrong email");
 

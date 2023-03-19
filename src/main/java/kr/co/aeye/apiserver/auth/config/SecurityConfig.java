@@ -1,7 +1,6 @@
 package kr.co.aeye.apiserver.auth.config;
 
 import kr.co.aeye.apiserver.jwt.config.JwtSecurityConfig;
-import kr.co.aeye.apiserver.auth.service.CustomOAuth2UserService;
 import kr.co.aeye.apiserver.jwt.tokens.TokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,17 +29,16 @@ public class SecurityConfig {
     protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
         http
                 .csrf().disable()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .apply(new JwtSecurityConfig(tokenProvider))
-                    .and()
-                .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/").permitAll()
-                        .requestMatchers("/auth/login").permitAll()
-                        .requestMatchers("/auth/signup").permitAll()
-                        .requestMatchers("/favicon.ico").permitAll()
-                        .anyRequest().authenticated()
-                );
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+
+        http.apply(new JwtSecurityConfig(tokenProvider));
+
+        http.authorizeHttpRequests((requests) -> requests
+                .requestMatchers("/").permitAll()
+                .requestMatchers("/auth/*").permitAll()
+                .requestMatchers("/favicon.ico").permitAll()
+                .anyRequest().authenticated()
+        );
 
         http.logout()
                 .deleteCookies("JSESSIONID");
