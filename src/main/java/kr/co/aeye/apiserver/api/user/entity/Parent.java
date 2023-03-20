@@ -19,11 +19,11 @@ public class Parent {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name="mainParent")
+    @JoinColumn(name="main_parent")
     private User mainParent;
 
     @ManyToOne
-    @JoinColumn(name="subParent")
+    @JoinColumn(name="sub_parent")
     private User subParent;
 
     @Column(length = 100)
@@ -31,4 +31,7 @@ public class Parent {
 
     @Column(length = 100)
     private String childTemperament;
+
+    @Column(length = 10)
+    private String authCode;
 }

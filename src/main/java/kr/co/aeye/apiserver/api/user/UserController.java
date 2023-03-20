@@ -1,8 +1,10 @@
 package kr.co.aeye.apiserver.api.user;
 
 import kr.co.aeye.apiserver.api.user.repository.UserRepository;
+import kr.co.aeye.apiserver.api.user.service.UserService;
 import kr.co.aeye.apiserver.auth.dto.PatchCodeReq;
 import kr.co.aeye.apiserver.auth.dto.PatchCodeRes;
+import kr.co.aeye.apiserver.common.BaseException;
 import kr.co.aeye.apiserver.common.BaseResponse;
 import kr.co.aeye.apiserver.common.BaseResponseStatus;
 import kr.co.aeye.apiserver.api.user.entity.User;
@@ -22,6 +24,7 @@ import java.util.Optional;
 public class UserController {
 
     private final UserRepository userRepository;
+    private final UserService userService;
 
     @GetMapping
     public BaseResponse<List<User>> getAllUser(){
@@ -44,13 +47,16 @@ public class UserController {
         }
     }
 
-    @GetMapping("/user/code")
-//    public BaseResponse<PatchCodeRes> setRoleType(@RequestBody PatchCodeReq patchCodeReq){
-    public void setRoleType(@RequestBody PatchCodeReq patchCodeReq){
+    @PatchMapping("/code")
+    public BaseResponse<PatchCodeRes> setRoleType(@RequestBody PatchCodeReq patchCodeReq){
         PatchCodeRes patchCodeRes;
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        try{
-//            patchCodeRes = authService.
-//        }
+        try {
+            patchCodeRes = userService.setRoleType(patchCodeReq, authentication);
+        }catch(BaseException e){
+            return new BaseResponse<>(e.getStatus());
+        }
+
+        return new BaseResponse<>(BaseResponseStatus.SUCCESS, patchCodeRes);
     }
 }
