@@ -29,16 +29,17 @@ public class SecurityConfig {
     protected SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
         http
                 .csrf().disable()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests
+                    .requestMatchers("/").permitAll()
+                    .requestMatchers("/auth/login").permitAll()
+                    .requestMatchers("/auth/signup").permitAll()
+                    .requestMatchers("/favicon.ico").permitAll()
+                    .anyRequest().authenticated()
+        );
 
         http.apply(new JwtSecurityConfig(tokenProvider));
-
-        http.authorizeHttpRequests((requests) -> requests
-                .requestMatchers("/").permitAll()
-                .requestMatchers("/auth/*").permitAll()
-                .requestMatchers("/favicon.ico").permitAll()
-                .anyRequest().authenticated()
-        );
 
         http.logout()
                 .deleteCookies("JSESSIONID");

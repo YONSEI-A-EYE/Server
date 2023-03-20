@@ -1,11 +1,15 @@
 package kr.co.aeye.apiserver.api.user;
 
 import kr.co.aeye.apiserver.api.user.repository.UserRepository;
+import kr.co.aeye.apiserver.auth.dto.PatchCodeReq;
+import kr.co.aeye.apiserver.auth.dto.PatchCodeRes;
 import kr.co.aeye.apiserver.common.BaseResponse;
 import kr.co.aeye.apiserver.common.BaseResponseStatus;
 import kr.co.aeye.apiserver.api.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -38,5 +42,15 @@ public class UserController {
             log.info("find user by id. reqUser={}", reqUser);
             return new BaseResponse<>(BaseResponseStatus.SUCCESS, reqUser);
         }
+    }
+
+    @GetMapping("/user/code")
+//    public BaseResponse<PatchCodeRes> setRoleType(@RequestBody PatchCodeReq patchCodeReq){
+    public void setRoleType(@RequestBody PatchCodeReq patchCodeReq){
+        PatchCodeRes patchCodeRes;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        try{
+//            patchCodeRes = authService.
+//        }
     }
 }

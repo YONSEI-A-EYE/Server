@@ -1,6 +1,8 @@
 package kr.co.aeye.apiserver.auth.controller;
 
 import kr.co.aeye.apiserver.api.user.dto.PostUserSignup;
+import kr.co.aeye.apiserver.auth.dto.PatchCodeReq;
+import kr.co.aeye.apiserver.auth.dto.PatchCodeRes;
 import kr.co.aeye.apiserver.auth.dto.PostLoginFailRes;
 import kr.co.aeye.apiserver.auth.dto.PostLoginReq;
 import kr.co.aeye.apiserver.auth.service.AuthService;
@@ -19,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/auth")
 public class AuthController {
     private final AuthService authService;
-
 
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody PostLoginReq postLoginReq) {
@@ -48,4 +49,6 @@ public class AuthController {
 
         return new BaseResponse<>(BaseResponseStatus.CREATED, isSuccess);
     }
+
+
 }
