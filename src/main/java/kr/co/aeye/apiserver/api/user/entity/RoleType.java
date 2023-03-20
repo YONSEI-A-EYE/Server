@@ -15,7 +15,4 @@ public enum RoleType {
     private final String code;
     private final String title;
 
-    public String getName(){
-        return this.name();
-    }
 }

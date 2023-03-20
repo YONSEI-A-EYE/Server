@@ -26,12 +26,6 @@ public class Parent {
     @JoinColumn(name="subParent", referencedColumnName = "id")
     private User subParent;
 
-    @Column(length = 100)
-    private String childName;
-
-    @Column(length = 100)
-    private String childTemperament;
-
     @Column(length = 10)
     private String authCode;
 }
