@@ -13,7 +13,10 @@ import kr.co.aeye.apiserver.common.BaseResponseStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
+
+import java.util.Collection;
 
 
 @Slf4j
@@ -31,6 +34,12 @@ public class UserService {
         String reqRole = patchCodeReq.getRole();
         Long userId = Long.parseLong(authentication.getName());
         User user = userRepository.getUserById(userId);
+        RoleType roleType = user.getRoleType();
+
+        if (!roleType.equals(RoleType.USER)){
+            throw new BaseException(BaseResponseStatus.BAD_REQUEST);
+        }
+
         if (reqRole.equals("main")){
             user.setRoleType(RoleType.MAIN_PARENT);
             String newAuthCode = AuthCodeGenerator.getAuthCode();
@@ -55,7 +64,9 @@ public class UserService {
             user.setRoleType(RoleType.SUB_PARENT);
             parent.setSubParent(user);
             patchCodeRes = PatchCodeRes.builder().build();
+            parentRepository.save(parent);
         }
+        userRepository.save(user);
         return patchCodeRes;
     }
 }

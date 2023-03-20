@@ -19,11 +19,11 @@ public class Parent {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name="main_parent")
+    @JoinColumn(name="mainParent", referencedColumnName = "id")
     private User mainParent;
 
     @ManyToOne
-    @JoinColumn(name="sub_parent")
+    @JoinColumn(name="subParent", referencedColumnName = "id")
     private User subParent;
 
     @Column(length = 100)
