@@ -17,6 +17,7 @@ public enum BaseResponseStatus {
     WRONG_EMOTION(false, 400, "wrong emotion"),
     ALREADY_EXIST_EMAIL(false, 400, "already exist email"),
     WRONG_PARENT_CODE(false, 400, "wrong parent code"),
+    PARENT_NOT_FOUND(false, 400, "set parent info first"),
     //401
     WRONG_CREDENTIAL(false, 401, "login fail"),
     WRONG_PASSWORD(false, 401, "wrong password"),

@@ -9,4 +9,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ParentRepository extends CrudRepository<Parent, Integer> {
         Parent getParentByAuthCode(String authCode);
-        }
+        Parent getParentByMainParent(Long id);
+        Parent getParentBySubParent(Long id);
+}

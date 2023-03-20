@@ -52,10 +52,8 @@ public class UserService {
                     .code(newAuthCode).build();
         }else {
             String authCode = patchCodeReq.getCode();
-            Parent parent;
-            try{
-                parent = parentRepository.getParentByAuthCode(authCode);
-            } catch (Exception e) {
+            Parent parent = parentRepository.getParentByAuthCode(authCode);
+            if (parent.equals(null)){
                 throw new BaseException(BaseResponseStatus.WRONG_PARENT_CODE);
             }
             user.setRoleType(RoleType.SUB_PARENT);
