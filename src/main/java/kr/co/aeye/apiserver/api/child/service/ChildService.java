@@ -1,6 +1,8 @@
 package kr.co.aeye.apiserver.api.child.service;
 
 import kr.co.aeye.apiserver.api.child.dto.GetChildInfoRes;
+import kr.co.aeye.apiserver.api.child.dto.PostChildReq;
+import kr.co.aeye.apiserver.api.child.dto.PostChildRes;
 import kr.co.aeye.apiserver.api.child.entity.Child;
 import kr.co.aeye.apiserver.api.child.repository.ChildRepository;
 import kr.co.aeye.apiserver.api.user.entity.Parent;
@@ -11,6 +13,7 @@ import kr.co.aeye.apiserver.api.user.repository.UserRepository;
 import kr.co.aeye.apiserver.common.BaseException;
 import kr.co.aeye.apiserver.common.BaseResponseStatus;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ChildService {
@@ -28,21 +32,26 @@ public class ChildService {
     private final ParentRepository parentRepository;
     private final UserRepository userRepository;
 
-    public Map<String, ArrayList<GetChildInfoRes>> getChildrenInfoList(Authentication authentication) throws BaseException{
-        Long userId = Long.parseLong(authentication.getName());
+    public Parent getParentFromUserId(Long userId) throws BaseException {
         User user = userRepository.getUserById(userId);
         RoleType roleType = user.getRoleType();
         Parent parent;
         if (roleType.equals(RoleType.MAIN_PARENT)) {
-            parent = parentRepository.getParentByMainParent(userId);
-        } else if (roleType.equals(RoleType.SUB_PARENT)){
-            parent = parentRepository.getParentBySubParent(userId);
-        } else{
+            parent = parentRepository.getParentByMainParent(user);
+        } else if (roleType.equals(RoleType.SUB_PARENT)) {
+            parent = parentRepository.getParentBySubParent(user);
+        } else {
             throw new BaseException(BaseResponseStatus.PARENT_NOT_FOUND);
         }
-        if (parent.equals(null)){
+        if (parent.equals(null)) {
             throw new BaseException(BaseResponseStatus.PARENT_NOT_FOUND);
         }
+        return parent;
+    }
+
+    public Map<String, ArrayList<GetChildInfoRes>> getChildrenInfoList(Authentication authentication) throws BaseException{
+        Long userId = Long.parseLong(authentication.getName());
+        Parent parent = getParentFromUserId(userId);
 
         List<Child> ChildrenListInfo = childRepository.getChildrenByParent(parent);
         ArrayList<GetChildInfoRes> ChildrenListData = new ArrayList<>();
@@ -59,5 +68,20 @@ public class ChildService {
         childrenList.put("children", ChildrenListData);
 
         return childrenList;
+    }
+
+    public PostChildRes addChildInfo(Authentication authentication, PostChildReq postChildReq) throws BaseException{
+        Long userId = Long.parseLong(authentication.getName());
+        Parent parent = getParentFromUserId(userId);
+
+        Child newChild = Child.builder()
+                .childName(postChildReq.getName())
+                .childTemperament(postChildReq.getTemperament())
+                .parent(parent)
+                .build();
+        childRepository.save(newChild);
+        log.info("save new child {} to parent {}", newChild.getId(), parent.getId());
+
+        return PostChildRes.builder().childId(newChild.getId()).build();
     }
 }
