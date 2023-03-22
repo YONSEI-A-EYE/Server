@@ -1,6 +1,7 @@
 package kr.co.aeye.apiserver.api.child;
 
 import kr.co.aeye.apiserver.api.child.dto.GetChildInfoRes;
+import kr.co.aeye.apiserver.api.child.dto.PatchChildRes;
 import kr.co.aeye.apiserver.api.child.dto.PostChildReq;
 import kr.co.aeye.apiserver.api.child.dto.PostChildRes;
 import kr.co.aeye.apiserver.api.child.service.ChildService;
@@ -45,6 +46,16 @@ public class ChildController {
             return new BaseResponse<>(e.getStatus());
         }
         return new BaseResponse<>(BaseResponseStatus.SUCCESS, postChildRes);
+    }
+
+    @PatchMapping("/advice/{childId}")
+    public BaseResponse patchChild(@PathVariable Long childId, @RequestBody PostChildReq postChildReq){
+        try{
+            childService.updateChildInfo(postChildReq, childId);
+        } catch (BaseException e){
+            return new BaseResponse<>(e.getStatus());
+        }
+        return new BaseResponse<>(BaseResponseStatus.SUCCESS);
     }
 
 }
