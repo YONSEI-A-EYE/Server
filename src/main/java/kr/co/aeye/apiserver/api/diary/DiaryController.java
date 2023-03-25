@@ -109,4 +109,15 @@ public class DiaryController {
         return new BaseResponse<>(BaseResponseStatus.SUCCESS, postCommentRes);
     }
 
+    @GetMapping("/comment/{diaryId}")
+    public BaseResponse<GetCommentRes> getComments(@PathVariable Long diaryId){
+        GetCommentRes getCommentRes;
+        try{
+            getCommentRes = diaryService.getCommentPageService(diaryId);
+        }catch (BaseException e){
+            return new BaseResponse<>(e.getStatus());
+        }
+        return new BaseResponse<>(BaseResponseStatus.SUCCESS, getCommentRes);
+    }
+
 }

@@ -5,6 +5,7 @@ import kr.co.aeye.apiserver.api.diary.entity.Comment;
 import kr.co.aeye.apiserver.api.diary.entity.Diary;
 import kr.co.aeye.apiserver.api.diary.entity.Video;
 import kr.co.aeye.apiserver.api.diary.repository.CommentRepository;
+import kr.co.aeye.apiserver.api.user.entity.RoleType;
 import kr.co.aeye.apiserver.common.BaseException;
 import kr.co.aeye.apiserver.common.BaseResponseStatus;
 import kr.co.aeye.apiserver.api.diary.dto.diaryReport.EmotionHistogram;
@@ -278,14 +279,60 @@ public class DiaryService {
                 .build();
 
         commentRepository.save(newComment);
-        int commentOrder = commentRepository.countCommentsByDiary(reqDiary).intValue();
-        Timestamp date = Timestamp.valueOf(newComment.getCreatedAt());
         log.info("save new comment={}", newComment.getId());
+
+        int commentOrder = commentRepository.countCommentsByDiary(reqDiary).intValue();
+        Long date = Timestamp.valueOf(newComment.getCreatedAt()).getTime();
+        RoleType roleType = user.getRoleType();
+        String role = getRole(roleType);
 
         return PostCommentRes.builder()
                 .order(commentOrder)
-                .date(date.getTime())
-                .role(user.getRoleType())
+                .date(date)
+                .role(role)
                 .build();
+    }
+
+    // 댓글 조회
+    public GetCommentRes getCommentPageService(Long diaryId) throws BaseException{
+        Diary reqDiary = diaryRepository.getById(diaryId);
+        if (reqDiary == null){
+            throw new BaseException(BaseResponseStatus.DIARY_NOT_FOUND);
+        }
+
+        List<Comment> commentList = commentRepository.getAllByDiaryOrderById(reqDiary);
+        List<CommentResult> commentResultList = new ArrayList<>();
+        int idx = 1;
+        for (Comment comment: commentList){
+            String role = getRole(comment.getUser().getRoleType());
+            Long date = Timestamp.valueOf(comment.getCreatedAt()).getTime();
+            CommentResult commentResult = CommentResult.builder()
+                    .order(idx)
+                    .role(role)
+                    .commentContent(comment.getContent())
+                    .commentCreatedAt(date)
+                    .build();
+            commentResultList.add(commentResult);
+            idx++;
+        }
+
+
+        return GetCommentRes.builder()
+                .content(reqDiary.getContent())
+                .emotion(reqDiary.getEmotion())
+                .comments(commentResultList)
+                .build();
+    }
+
+    public String getRole(RoleType roleType) throws BaseException{
+        String role;
+        if (roleType.equals(RoleType.MAIN_PARENT)) {
+            role = "main";
+        }else if (roleType.equals(RoleType.SUB_PARENT)){
+            role = "sub";
+        }else{
+            throw new BaseException(BaseResponseStatus.PARENT_NOT_FOUND);
+        }
+        return role;
     }
 }

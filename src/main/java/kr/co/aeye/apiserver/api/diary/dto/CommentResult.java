@@ -7,8 +7,9 @@ import lombok.Getter;
 @Getter
 @Builder
 @Data
-public class PostCommentRes {
+public class CommentResult {
     private int order;
-    private Long date;
     private String role;
+    private String commentContent;
+    private Long commentCreatedAt;
 }
