@@ -7,6 +7,8 @@ import kr.co.aeye.apiserver.common.BaseResponseStatus;
 import kr.co.aeye.apiserver.api.diary.service.DiaryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
  import java.util.TreeMap;
@@ -93,4 +95,18 @@ public class DiaryController {
 
         return new BaseResponse<>(BaseResponseStatus.SUCCESS, getMonthlyReportRes);
     }
+
+    // 댓글 작성
+    @PostMapping("/comment/{diaryId}")
+    public BaseResponse<PostCommentRes> postComment(@PathVariable Long diaryId, @RequestBody PostCommentReq postCommentReq){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        PostCommentRes postCommentRes;
+        try{
+            postCommentRes = diaryService.postCommentService(diaryId, postCommentReq, authentication);
+        }catch(BaseException e){
+            return new BaseResponse<>(e.getStatus());
+        }
+        return new BaseResponse<>(BaseResponseStatus.SUCCESS, postCommentRes);
+    }
+
 }

@@ -1,8 +1,10 @@
 package kr.co.aeye.apiserver.api.diary.service;
 
 import kr.co.aeye.apiserver.api.diary.dto.*;
+import kr.co.aeye.apiserver.api.diary.entity.Comment;
 import kr.co.aeye.apiserver.api.diary.entity.Diary;
 import kr.co.aeye.apiserver.api.diary.entity.Video;
+import kr.co.aeye.apiserver.api.diary.repository.CommentRepository;
 import kr.co.aeye.apiserver.common.BaseException;
 import kr.co.aeye.apiserver.common.BaseResponseStatus;
 import kr.co.aeye.apiserver.api.diary.dto.diaryReport.EmotionHistogram;
@@ -16,25 +18,27 @@ import kr.co.aeye.apiserver.api.diary.utils.GetSentimentLevel;
 import kr.co.aeye.apiserver.api.diary.utils.GoogleEmotion;
 import kr.co.aeye.apiserver.api.user.repository.UserRepository;
 import kr.co.aeye.apiserver.api.user.entity.User;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.*;
 import com.google.cloud.language.v1.Sentiment;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class DiaryService {
 
     private final DiaryRepository diaryRepository;
     private final VideoRepository videoRepository;
     private final UserRepository userRepository;
+    private final CommentRepository commentRepository;
 
-    public DiaryService(DiaryRepository diaryRepository, VideoRepository videoRepository, UserRepository userRepository){
-        this.diaryRepository = diaryRepository;
-        this.videoRepository = videoRepository;
-        this.userRepository = userRepository;
-    }
+
 
     // diary 조회하기 - emotion 저장 안된 diary
     public GetUpdateDiaryRes getDiaryById(Long diaryId) throws BaseException{
@@ -251,6 +255,37 @@ public class DiaryService {
                 .sentimentLevel(sentimentLevel)
                 .emotionHistogram(emotionHistogram)
                 .monthlyEmotion(monthlyEmotion)
+                .build();
+    }
+
+    //댓글 작성
+    public PostCommentRes postCommentService(Long diaryId, PostCommentReq postCommentReq, Authentication authentication) throws BaseException{
+        Long userId = Long.parseLong(authentication.getName());
+        User user = userRepository.getUserById(userId);
+        if (user==null){
+            throw new BaseException(BaseResponseStatus.USER_NOT_FOUND);
+        }
+
+        Diary reqDiary = diaryRepository.getById(diaryId);
+        if (reqDiary == null){
+            throw new BaseException(BaseResponseStatus.DIARY_NOT_FOUND);
+        }
+
+        Comment newComment = Comment.builder()
+                .user(user)
+                .content(postCommentReq.getCommentContent())
+                .diary(reqDiary)
+                .build();
+
+        commentRepository.save(newComment);
+        int commentOrder = commentRepository.countCommentsByDiary(reqDiary).intValue();
+        Timestamp date = Timestamp.valueOf(newComment.getCreatedAt());
+        log.info("save new comment={}", newComment.getId());
+
+        return PostCommentRes.builder()
+                .order(commentOrder)
+                .date(date.getTime())
+                .role(user.getRoleType())
                 .build();
     }
 }
