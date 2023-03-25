@@ -11,4 +11,5 @@ import lombok.Getter;
 public class GetHomeRes {
     private HomeVideo homeVideo;
     private String code;
+    private String role;
 }

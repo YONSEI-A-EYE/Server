@@ -65,6 +65,7 @@ public class MainService {
 
         GetHomeRes homeRes = GetHomeRes.builder()
                 .code(code)
+                .role(getRole(user.getRoleType()))
                 .build();
 
         LocalDate now = LocalDate.now();
@@ -82,5 +83,19 @@ public class MainService {
         }
 
         return homeRes;
+    }
+
+    public String getRole(RoleType roleType) throws BaseException{
+        String role;
+        if (roleType.equals(RoleType.MAIN_PARENT)) {
+            role = "main";
+        }else if (roleType.equals(RoleType.SUB_PARENT)){
+            role = "sub";
+        }else if (roleType.equals(RoleType.USER)){
+            role = null;
+        }else{
+            throw new BaseException(BaseResponseStatus.PARENT_NOT_FOUND);
+        }
+        return role;
     }
 }
