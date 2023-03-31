@@ -260,17 +260,14 @@ public class DiaryService {
     //diary monthly report 페이지
     public GetMonthlyReportRes getDiaryMonthlyReportService(Authentication authentication, int year, int month) throws BaseException{
         Long userId = Long.parseLong(authentication.getName());
-        User user = userRepository.getUserById(userId);
-        if (user == null){
-            throw new BaseException(BaseResponseStatus.USER_NOT_FOUND);
-        }
+        User mainParentUser = getMainParentUserFromUserId(userId);
 
         LocalDate firstDate = LocalDate.of(year, month, 1);
         LocalDate lastDate = firstDate.withDayOfMonth(firstDate.lengthOfMonth());
 
-        EmotionHistogram emotionHistogram = diaryRepository.getEmotionHistogramByDateBetween(firstDate, lastDate);
+        EmotionHistogram emotionHistogram = diaryRepository.getEmotionHistogramByDateBetween(mainParentUser.getId(), firstDate, lastDate);
         log.info("emotionHistogram ={}", emotionHistogram);
-        List<Diary> diaryList = diaryRepository.findDiariesByUserAndDateBetween(user, firstDate, lastDate);
+        List<Diary> diaryList = diaryRepository.findDiariesByUserAndDateBetween(mainParentUser, firstDate, lastDate);
         log.info("diaryList ={}", diaryList);
         SentimentLevel sentimentLevel = GetMonthlySentimentLevel.getMonthlySentimentLevel(diaryList);
         String mostFrequentEmotion = emotionHistogram.getMostFrequentEmotion();

@@ -35,7 +35,7 @@ import java.time.LocalDateTime;
                         "       count(case when emotion like 'bored%' then 1 end)         as bored,\n" +
                         "       count(case when emotion like 'tired%' then 1 end)         as tired\n" +
                         "from diary\n" +
-                        "where date between :startDate AND :endDate",
+                        "where user=:userId AND date between :startDate AND :endDate",
         resultSetMapping = "emotion_histogram_dto"
 )
 @SqlResultSetMapping(

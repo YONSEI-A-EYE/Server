@@ -21,5 +21,5 @@ public interface DiaryRepository extends JpaRepository<Diary, Integer> {
     Diary getDiaryByUserAndDate(User user, LocalDate datetime);
     List<Diary> findDiariesByUserAndDateBetween(User user, LocalDate startDate, LocalDate endDate);
     @Query(name="find_emotion_histogram", nativeQuery = true)
-    EmotionHistogram getEmotionHistogramByDateBetween(LocalDate startDate, LocalDate endDate);
+    EmotionHistogram getEmotionHistogramByDateBetween(Long userId, LocalDate startDate, LocalDate endDate);
 }
