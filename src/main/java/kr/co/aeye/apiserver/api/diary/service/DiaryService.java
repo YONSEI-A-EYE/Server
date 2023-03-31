@@ -105,18 +105,18 @@ public class DiaryService {
     }
 
     // diary 추가하기
-    public PostDiaryRes addNewDiary(PostDiaryReq postDiaryReq) throws BaseException {
+    public PostDiaryRes addNewDiary(Authentication authentication, PostDiaryReq postDiaryReq) throws BaseException {
+        Long userId = Long.parseLong(authentication.getName());
+        User user = userRepository.getUserById(userId);
+        if (user == null){
+            throw new BaseException(BaseResponseStatus.USER_NOT_FOUND);
+        }
+
         int year = postDiaryReq.getYear();
         int month = postDiaryReq.getMonth();
         int day = postDiaryReq.getDay();
 
         LocalDate postDate = LocalDate.of(year, month, day);
-
-        Optional<User> tempUser = userRepository.findById(1);
-        if (tempUser.isEmpty()){
-            throw new BaseException(BaseResponseStatus.USER_NOT_FOUND);
-        }
-        User user = tempUser.get();
 
         boolean isExist = diaryRepository.existsDiaryByUserAndDate(user, postDate);
         if (isExist){

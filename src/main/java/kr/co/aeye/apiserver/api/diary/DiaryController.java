@@ -68,8 +68,10 @@ public class DiaryController {
     @PostMapping
     public BaseResponse<PostDiaryRes> addDiary(@RequestBody PostDiaryReq postDiaryReq) {
         PostDiaryRes postDiaryRes;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
         try {
-            postDiaryRes = diaryService.addNewDiary(postDiaryReq);
+            postDiaryRes = diaryService.addNewDiary(authentication, postDiaryReq);
         } catch (BaseException e){
             return new BaseResponse<>(e.getStatus());
         }
