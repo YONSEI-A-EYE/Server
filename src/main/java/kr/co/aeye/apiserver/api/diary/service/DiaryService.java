@@ -5,7 +5,9 @@ import kr.co.aeye.apiserver.api.diary.entity.Comment;
 import kr.co.aeye.apiserver.api.diary.entity.Diary;
 import kr.co.aeye.apiserver.api.diary.entity.Video;
 import kr.co.aeye.apiserver.api.diary.repository.CommentRepository;
+import kr.co.aeye.apiserver.api.user.entity.Parent;
 import kr.co.aeye.apiserver.api.user.entity.RoleType;
+import kr.co.aeye.apiserver.api.user.repository.ParentRepository;
 import kr.co.aeye.apiserver.common.BaseException;
 import kr.co.aeye.apiserver.common.BaseResponseStatus;
 import kr.co.aeye.apiserver.api.diary.dto.diaryReport.EmotionHistogram;
@@ -38,8 +40,24 @@ public class DiaryService {
     private final VideoRepository videoRepository;
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
+    private final ParentRepository parentRepository;
 
-
+    public User getMainParentUserFromUserId(Long userId) throws BaseException {
+        User user = userRepository.getUserById(userId);
+        RoleType roleType = user.getRoleType();
+        Parent parent;
+        if (roleType.equals(RoleType.MAIN_PARENT)) {
+            parent = parentRepository.getParentByMainParent(user);
+        } else if (roleType.equals(RoleType.SUB_PARENT)) {
+            parent = parentRepository.getParentBySubParent(user);
+        } else {
+            throw new BaseException(BaseResponseStatus.PARENT_NOT_FOUND);
+        }
+        if (parent.equals(null)) {
+            throw new BaseException(BaseResponseStatus.PARENT_NOT_FOUND);
+        }
+        return parent.getMainParent();
+    }
 
     // diary 조회하기 - emotion 저장 안된 diary
     public GetUpdateDiaryRes getDiaryById(Long diaryId) throws BaseException{
@@ -63,15 +81,12 @@ public class DiaryService {
     // 월별 diary 조회하기
     public TreeMap<Integer, GetMonthlyDiaryRes> getMonthlyDiary(Authentication authentication, int year, int month) throws BaseException{
         Long userId = Long.parseLong(authentication.getName());
-        User user = userRepository.getUserById(userId);
-        if (user == null){
-            throw new BaseException(BaseResponseStatus.USER_NOT_FOUND);
-        }
+        User mainParentUser = getMainParentUserFromUserId(userId);
 
         LocalDate firstDate = LocalDate.of(year, month, 1);
         LocalDate lastDate = firstDate.withDayOfMonth(firstDate.lengthOfMonth());
 
-        List<Diary> diaryList = diaryRepository.findDiariesByUserAndDateBetween(user, firstDate, lastDate);
+        List<Diary> diaryList = diaryRepository.findDiariesByUserAndDateBetween(mainParentUser, firstDate, lastDate);
         HashMap<Integer, Diary> diaryHashMap = new HashMap<>();
         for (Diary diary : diaryList) {
             int diaryDay = diary.getDate().getDayOfMonth();
