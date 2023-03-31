@@ -23,7 +23,14 @@ public class DiaryController {
 
     @GetMapping("/month")
     public BaseResponse<TreeMap<Integer, GetMonthlyDiaryRes>> getMonthlyDiary(@RequestParam int year, int month){
-        TreeMap<Integer, GetMonthlyDiaryRes> monthlyDiary = diaryService.getMonthlyDiary(year, month);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        TreeMap<Integer, GetMonthlyDiaryRes> monthlyDiary;
+        try{
+            monthlyDiary = diaryService.getMonthlyDiary(authentication, year, month);
+        } catch (BaseException e){
+            return new BaseResponse<>(e.getStatus());
+        }
+
         return new BaseResponse<>(BaseResponseStatus.SUCCESS, monthlyDiary);
     }
 
@@ -87,8 +94,9 @@ public class DiaryController {
     @GetMapping("/report")
     public BaseResponse<GetMonthlyReportRes> getMonthlyReport(@RequestParam int year, int month){
         GetMonthlyReportRes getMonthlyReportRes;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         try{
-            getMonthlyReportRes = diaryService.getDiaryMonthlyReportService(year, month);
+            getMonthlyReportRes = diaryService.getDiaryMonthlyReportService(authentication, year, month);
         } catch (BaseException e){
             return new BaseResponse<>(e.getStatus());
         }

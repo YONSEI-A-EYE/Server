@@ -61,11 +61,17 @@ public class DiaryService {
     }
 
     // 월별 diary 조회하기
-    public TreeMap<Integer, GetMonthlyDiaryRes> getMonthlyDiary(int year, int month){
+    public TreeMap<Integer, GetMonthlyDiaryRes> getMonthlyDiary(Authentication authentication, int year, int month) throws BaseException{
+        Long userId = Long.parseLong(authentication.getName());
+        User user = userRepository.getUserById(userId);
+        if (user == null){
+            throw new BaseException(BaseResponseStatus.USER_NOT_FOUND);
+        }
+
         LocalDate firstDate = LocalDate.of(year, month, 1);
         LocalDate lastDate = firstDate.withDayOfMonth(firstDate.lengthOfMonth());
 
-        List<Diary> diaryList = diaryRepository.findDiariesByDateBetween(firstDate, lastDate);
+        List<Diary> diaryList = diaryRepository.findDiariesByUserAndDateBetween(user, firstDate, lastDate);
         HashMap<Integer, Diary> diaryHashMap = new HashMap<>();
         for (Diary diary : diaryList) {
             int diaryDay = diary.getDate().getDayOfMonth();
@@ -237,13 +243,19 @@ public class DiaryService {
     }
 
     //diary monthly report 페이지
-    public GetMonthlyReportRes getDiaryMonthlyReportService(int year, int month) throws BaseException{
+    public GetMonthlyReportRes getDiaryMonthlyReportService(Authentication authentication, int year, int month) throws BaseException{
+        Long userId = Long.parseLong(authentication.getName());
+        User user = userRepository.getUserById(userId);
+        if (user == null){
+            throw new BaseException(BaseResponseStatus.USER_NOT_FOUND);
+        }
+
         LocalDate firstDate = LocalDate.of(year, month, 1);
         LocalDate lastDate = firstDate.withDayOfMonth(firstDate.lengthOfMonth());
 
         EmotionHistogram emotionHistogram = diaryRepository.getEmotionHistogramByDateBetween(firstDate, lastDate);
         log.info("emotionHistogram ={}", emotionHistogram);
-        List<Diary> diaryList = diaryRepository.findDiariesByDateBetween(firstDate, lastDate);
+        List<Diary> diaryList = diaryRepository.findDiariesByUserAndDateBetween(user, firstDate, lastDate);
         log.info("diaryList ={}", diaryList);
         SentimentLevel sentimentLevel = GetMonthlySentimentLevel.getMonthlySentimentLevel(diaryList);
         String mostFrequentEmotion = emotionHistogram.getMostFrequentEmotion();
