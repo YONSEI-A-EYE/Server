@@ -86,7 +86,7 @@ public class DiaryService {
         LocalDate firstDate = LocalDate.of(year, month, 1);
         LocalDate lastDate = firstDate.withDayOfMonth(firstDate.lengthOfMonth());
 
-        List<Diary> diaryList = diaryRepository.findDiariesByUserAndDateBetween(mainParentUser, firstDate, lastDate);
+        List<Diary> diaryList = diaryRepository.findDiariesByUserAndDateBetweenAndEmotionIsNotNull(mainParentUser, firstDate, lastDate);
         HashMap<Integer, Diary> diaryHashMap = new HashMap<>();
         for (Diary diary : diaryList) {
             int diaryDay = diary.getDate().getDayOfMonth();
@@ -267,7 +267,7 @@ public class DiaryService {
 
         EmotionHistogram emotionHistogram = diaryRepository.getEmotionHistogramByDateBetween(mainParentUser.getId(), firstDate, lastDate);
         log.info("emotionHistogram ={}", emotionHistogram);
-        List<Diary> diaryList = diaryRepository.findDiariesByUserAndDateBetween(mainParentUser, firstDate, lastDate);
+        List<Diary> diaryList = diaryRepository.findDiariesByUserAndDateBetweenAndEmotionIsNotNull(mainParentUser, firstDate, lastDate);
         log.info("diaryList ={}", diaryList);
         SentimentLevel sentimentLevel = GetMonthlySentimentLevel.getMonthlySentimentLevel(diaryList);
         String mostFrequentEmotion = emotionHistogram.getMostFrequentEmotion();
