@@ -1,6 +1,13 @@
+logging:
+  level:
+    org:
+      hibernate:
+        type:
+          descriptor:
+            sql: trace
+
 spring:
   profiles:
-    default: local
     include: secret
 
   jpa:
