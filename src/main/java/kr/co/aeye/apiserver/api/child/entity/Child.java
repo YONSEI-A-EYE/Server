@@ -21,6 +21,9 @@ public class Child {
     @Column(length = 100)
     private String childName;
 
+    @Column
+    private int childAge;
+
     @Column(length = 100)
     private String childTemperament;
 

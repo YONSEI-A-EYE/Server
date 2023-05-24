@@ -78,6 +78,7 @@ public class ChildService {
         Child newChild = Child.builder()
                 .childName(postChildReq.getName())
                 .childTemperament(postChildReq.getTemperament())
+                .childAge(postChildReq.getAge())
                 .parent(parent)
                 .build();
         childRepository.save(newChild);
@@ -92,6 +93,7 @@ public class ChildService {
             throw new BaseException(BaseResponseStatus.BAD_REQUEST);
         }
         child.setChildName(postChildReq.getName());
+        child.setChildAge(postChildReq.getAge());
         child.setChildTemperament(postChildReq.getTemperament());
         childRepository.save(child);
         log.info("update child {}", child.getId());

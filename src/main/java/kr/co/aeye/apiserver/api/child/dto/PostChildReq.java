@@ -9,5 +9,6 @@ import lombok.*;
 @Data
 public class PostChildReq {
     private String name;
+    private int age;
     private String temperament;
 }
