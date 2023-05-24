@@ -10,5 +10,6 @@ import lombok.Getter;
 public class GetChildInfoRes {
     private Long id;
     private String name;
+    private int age;
     private String temperament;
 }

@@ -61,6 +61,7 @@ public class ChildService {
             GetChildInfoRes newGetChildInfo = GetChildInfoRes.builder()
                     .id(child.getId())
                     .name(child.getChildName())
+                    .age(child.getChildAge())
                     .temperament(child.getChildTemperament())
                     .build();
             ChildrenListData.add(newGetChildInfo);
