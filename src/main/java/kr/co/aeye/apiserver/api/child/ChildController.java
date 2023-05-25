@@ -1,13 +1,11 @@
 package kr.co.aeye.apiserver.api.child;
 
-import kr.co.aeye.apiserver.api.child.dto.GetChildInfoRes;
-import kr.co.aeye.apiserver.api.child.dto.PatchChildRes;
-import kr.co.aeye.apiserver.api.child.dto.PostChildReq;
-import kr.co.aeye.apiserver.api.child.dto.PostChildRes;
+import kr.co.aeye.apiserver.api.child.dto.*;
 import kr.co.aeye.apiserver.api.child.service.ChildService;
 import kr.co.aeye.apiserver.common.BaseException;
 import kr.co.aeye.apiserver.common.BaseResponse;
 import kr.co.aeye.apiserver.common.BaseResponseStatus;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -56,6 +54,17 @@ public class ChildController {
             return new BaseResponse<>(e.getStatus());
         }
         return new BaseResponse<>(BaseResponseStatus.SUCCESS);
+    }
+
+    @GetMapping("/advice/bard")
+    public BaseResponse<GetAdviceBardRes> getBardAdvice(@RequestParam Long childId){
+        GetAdviceBardRes getAdviceBardRes;
+        try{
+            getAdviceBardRes = childService.getChildInfo(childId);
+        } catch (BaseException e){
+            return new BaseResponse<>(e.getStatus());
+        }
+        return new BaseResponse<>(BaseResponseStatus.SUCCESS, getAdviceBardRes);
     }
 
 }
