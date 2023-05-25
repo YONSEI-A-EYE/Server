@@ -1,4 +1,4 @@
-package kr.co.aeye.apiserver.api.child.dto;
+package kr.co.aeye.apiserver.api.child.dto.bard;
 
 import lombok.Builder;
 import lombok.Data;
@@ -10,5 +10,6 @@ import java.util.ArrayList;
 @Getter
 @Data
 public class PostAdviceFromBardRes {
-    private ArrayList<AdviceSet> advice;
+    private String title;
+    private ArrayList<SolutionObjectDto> solutions;
 }

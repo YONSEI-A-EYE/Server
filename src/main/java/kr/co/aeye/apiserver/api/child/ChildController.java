@@ -1,17 +1,21 @@
 package kr.co.aeye.apiserver.api.child;
 
 import kr.co.aeye.apiserver.api.child.dto.*;
+import kr.co.aeye.apiserver.api.child.dto.bard.PostAdviceBardReq;
+import kr.co.aeye.apiserver.api.child.dto.bard.PostAdviceFromBardRes;
+import kr.co.aeye.apiserver.api.child.service.BardAdviceService;
 import kr.co.aeye.apiserver.api.child.service.ChildService;
 import kr.co.aeye.apiserver.common.BaseException;
 import kr.co.aeye.apiserver.common.BaseResponse;
 import kr.co.aeye.apiserver.common.BaseResponseStatus;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -21,6 +25,7 @@ import java.util.Map;
 @RequestMapping("/child")
 public class ChildController {
     private final ChildService childService;
+    private final BardAdviceService bardAdviceService;
 
     @GetMapping("/advice")
     public BaseResponse<Map<String, ArrayList<GetChildInfoRes>>> listChild(){
@@ -67,4 +72,17 @@ public class ChildController {
         return new BaseResponse<>(BaseResponseStatus.SUCCESS, getAdviceBardRes);
     }
 
+    @PostMapping("/advice/bard")
+    public BaseResponse postBardAdvice(@RequestParam Long childId, @RequestBody PostAdviceBardReq postAdviceBardReq){
+        try{
+            bardAdviceService.postAdviceToBard(postAdviceBardReq);
+        } catch (BaseException e){
+            return new BaseResponse<>(e.getStatus());
+        } catch (ProtocolException e) {
+            throw new RuntimeException(e);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+        return new BaseResponse<>(BaseResponseStatus.SUCCESS);
+    }
 }
