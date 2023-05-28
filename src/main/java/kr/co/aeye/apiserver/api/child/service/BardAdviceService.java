@@ -1,75 +1,58 @@
 package kr.co.aeye.apiserver.api.child.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.aeye.apiserver.api.child.dto.bard.PostAdviceBardReq;
 import kr.co.aeye.apiserver.api.child.dto.bard.PostAdviceFromBardRes;
+import kr.co.aeye.apiserver.api.child.utils.PostBardAPI;
 import kr.co.aeye.apiserver.common.BaseException;
 import kr.co.aeye.apiserver.common.BaseResponseStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.json.simple.parser.ParseException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
-import java.net.URL;
-import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static kr.co.aeye.apiserver.common.BaseResponseStatus.SERVER_ERROR;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class BardAdviceService {
-    public void postAdviceToBard(PostAdviceBardReq postAdviceBardReq) throws BaseException, MalformedURLException, ProtocolException {
-        String childName = postAdviceBardReq.getChildName();
-        int childAge = postAdviceBardReq.getChildAge();
-        String childTemperament = postAdviceBardReq.getChildTemperament();
-        String content = postAdviceBardReq.getContent();
+    @Value("${bard.api-key}") String apiKey;
 
-        String bardInput = String.format(
-                "{\'input\': \'" +
-                        "%s is %d years old. " +
-                        "%s has %s. " +
-                        "%s. " +
-                        "What can I do? " +
-                        "Give me 5 solutions. " +
-                        "Give me title and solutions with object list in json format." +
-                        "Solution object has index, title and content\'}",
-                childName, childAge, childName, childTemperament, content);
-        String authorizationHeader = "Bearer " + apiKey;
+    public PostAdviceFromBardRes postAdviceToBard(PostAdviceBardReq postAdviceBardReq) throws BaseException, MalformedURLException, ProtocolException, ParseException, JsonProcessingException {
+        PostBardAPI postBardAPI = new PostBardAPI(apiKey);
+        PostAdviceFromBardRes postAdviceFromBardRes;
         try{
-            URL bardChatUrl = new URL("https://api.bardapi.dev/chat");
-            HttpURLConnection connection = (HttpURLConnection) bardChatUrl.openConnection();
-            connection.setRequestMethod("POST");
-            connection.setRequestProperty("Content-Type", "text/plain");
-            connection.setRequestProperty("Authorization", authorizationHeader);
-            connection.setDoOutput(true);
-
-            OutputStream outputStream = connection.getOutputStream();
-            outputStream.write(bardInput.getBytes("UTF-8"));
-            outputStream.close();
-
-            int responseCode = connection.getResponseCode();
-
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            String line;
-            StringBuilder response = new StringBuilder();
-            while ((line = bufferedReader.readLine()) != null) {
-                response.append(line);
-            }
-            bufferedReader.close();
-
-            // Print the response
-            System.out.println("Response Code: " + responseCode);
-            System.out.println("Response: " + response.toString());
-
-            // Close the connection
-            connection.disconnect();
-
-
+            String answerFromBard = postBardAPI.getResponse(postAdviceBardReq);
+            String jsonFormAnswer = extractJsonFormInString(answerFromBard);
+            jsonFormAnswer = jsonFormAnswer.replaceAll("\\\\n|\\\\", "");
+            ObjectMapper mapper = new ObjectMapper();
+            postAdviceFromBardRes = mapper.readValue(jsonFormAnswer, PostAdviceFromBardRes.class);
         } catch (Exception e){
+            throw new BaseException(SERVER_ERROR);
+        }
+
+        return postAdviceFromBardRes;
+    }
+
+    public String extractJsonFormInString(String text) throws BaseException {
+        String jsonPattern = "(?s)```json\\s*(.*?)\\s*```";
+        Pattern pattern = Pattern.compile(jsonPattern);
+        Matcher matcher = pattern.matcher(text);
+        String jsonContent;
+
+        if (matcher.find()) {
+            jsonContent = matcher.group(1);
+        } else {
             throw new BaseException(BaseResponseStatus.BAD_REQUEST);
         }
+        return jsonContent;
     }
 }

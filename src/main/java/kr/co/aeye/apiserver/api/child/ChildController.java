@@ -1,5 +1,6 @@
 package kr.co.aeye.apiserver.api.child;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import kr.co.aeye.apiserver.api.child.dto.*;
 import kr.co.aeye.apiserver.api.child.dto.bard.PostAdviceBardReq;
 import kr.co.aeye.apiserver.api.child.dto.bard.PostAdviceFromBardRes;
@@ -10,6 +11,7 @@ import kr.co.aeye.apiserver.common.BaseResponse;
 import kr.co.aeye.apiserver.common.BaseResponseStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.json.simple.parser.ParseException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -74,15 +76,21 @@ public class ChildController {
 
     @PostMapping("/advice/bard")
     public BaseResponse postBardAdvice(@RequestParam Long childId, @RequestBody PostAdviceBardReq postAdviceBardReq){
+        PostAdviceFromBardRes postAdviceFromBardRes;
         try{
-            bardAdviceService.postAdviceToBard(postAdviceBardReq);
+            postAdviceFromBardRes = bardAdviceService.postAdviceToBard(postAdviceBardReq);
         } catch (BaseException e){
             return new BaseResponse<>(e.getStatus());
         } catch (ProtocolException e) {
             throw new RuntimeException(e);
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
         }
-        return new BaseResponse<>(BaseResponseStatus.SUCCESS);
+
+        return new BaseResponse<>(BaseResponseStatus.SUCCESS, postAdviceFromBardRes);
     }
 }

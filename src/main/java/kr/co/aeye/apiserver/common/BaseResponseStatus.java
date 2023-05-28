@@ -21,7 +21,10 @@ public enum BaseResponseStatus {
     //401
     WRONG_CREDENTIAL(false, 401, "login fail"),
     WRONG_PASSWORD(false, 401, "wrong password"),
-    WRONG_EMAIL(false, 401, "wrong email");
+    WRONG_EMAIL(false, 401, "wrong email"),
+
+    //500
+    SERVER_ERROR(false, 500, "internal server error");
 
 
 

@@ -1,12 +1,11 @@
 package kr.co.aeye.apiserver.api.child.dto.bard;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
+import lombok.*;
 
 import java.util.ArrayList;
 
-@Builder
+//@Builder
+@NoArgsConstructor
 @Getter
 @Data
 public class PostAdviceFromBardRes {
