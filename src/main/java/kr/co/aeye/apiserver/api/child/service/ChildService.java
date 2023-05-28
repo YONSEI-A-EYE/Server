@@ -1,9 +1,6 @@
 package kr.co.aeye.apiserver.api.child.service;
 
-import kr.co.aeye.apiserver.api.child.dto.GetChildInfoRes;
-import kr.co.aeye.apiserver.api.child.dto.PatchChildRes;
-import kr.co.aeye.apiserver.api.child.dto.PostChildReq;
-import kr.co.aeye.apiserver.api.child.dto.PostChildRes;
+import kr.co.aeye.apiserver.api.child.dto.*;
 import kr.co.aeye.apiserver.api.child.entity.Child;
 import kr.co.aeye.apiserver.api.child.repository.ChildRepository;
 import kr.co.aeye.apiserver.api.user.entity.Parent;
@@ -98,5 +95,19 @@ public class ChildService {
         child.setChildTemperament(postChildReq.getTemperament());
         childRepository.save(child);
         log.info("update child {}", child.getId());
+    }
+
+    public GetAdviceBardRes getChildInfo(Long childId) throws BaseException{
+        Child child = childRepository.getChildById(childId);
+        if (child.equals(null)){
+            throw new BaseException(BaseResponseStatus.BAD_REQUEST);
+        }
+        GetAdviceBardRes getAdviceBardRes = GetAdviceBardRes.builder()
+                .childName(child.getChildName())
+                .childAge(child.getChildAge())
+                .childTemperament(child.getChildTemperament())
+                .build();
+
+        return getAdviceBardRes;
     }
 }
