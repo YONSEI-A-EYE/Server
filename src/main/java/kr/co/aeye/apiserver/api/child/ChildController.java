@@ -3,7 +3,7 @@ package kr.co.aeye.apiserver.api.child;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import kr.co.aeye.apiserver.api.child.dto.*;
 import kr.co.aeye.apiserver.api.child.dto.bard.PostAdviceBardReq;
-import kr.co.aeye.apiserver.api.child.dto.bard.PostAdviceFromBardRes;
+import kr.co.aeye.apiserver.api.child.dto.bard.SolutionObjectDto;
 import kr.co.aeye.apiserver.api.child.service.BardAdviceService;
 import kr.co.aeye.apiserver.api.child.service.ChildService;
 import kr.co.aeye.apiserver.common.BaseException;
@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -75,10 +76,10 @@ public class ChildController {
     }
 
     @PostMapping("/advice/bard")
-    public BaseResponse postBardAdvice(@RequestParam Long childId, @RequestBody PostAdviceBardReq postAdviceBardReq){
-        PostAdviceFromBardRes postAdviceFromBardRes;
+    public BaseResponse<List<SolutionObjectDto>> postBardAdvice(@RequestBody PostAdviceBardReq postAdviceBardReq){
+        List<SolutionObjectDto> bardSolutionList;
         try{
-            postAdviceFromBardRes = bardAdviceService.postAdviceToBard(postAdviceBardReq);
+            bardSolutionList = bardAdviceService.postAdviceToBard(postAdviceBardReq);
         } catch (BaseException e){
             return new BaseResponse<>(e.getStatus());
         } catch (ProtocolException e) {
@@ -91,6 +92,6 @@ public class ChildController {
             throw new RuntimeException(e);
         }
 
-        return new BaseResponse<>(BaseResponseStatus.SUCCESS, postAdviceFromBardRes);
+        return new BaseResponse<>(BaseResponseStatus.SUCCESS, bardSolutionList);
     }
 }

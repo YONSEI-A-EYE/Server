@@ -24,9 +24,8 @@ public class PostBardAPI {
                         "%s has %s. " +
                         "%s. " +
                         "What can I do? " +
-                        "Give me 5 solutions. " +
-                        "Give me title and solutions with object list in json format. " +
-                        "Solution object has index, title and content.\"}",
+                        "Show me 5 solutions and each solution has index, title and content. " +
+                        "Response should be only json format which consist of solution object list.\"}",
                 childName, childAge, childName, childTemperament, content);
 
         return postBody;
