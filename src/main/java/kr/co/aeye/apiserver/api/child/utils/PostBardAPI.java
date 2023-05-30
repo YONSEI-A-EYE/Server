@@ -33,6 +33,8 @@ public class PostBardAPI {
 
     public String getResponse (PostAdviceBardReq postAdviceBardReq) throws BaseException {
         String result = null;
+        Response response = null;
+        ResponseBody body = null;
         try {
             String postBody = this.setPostBody(postAdviceBardReq);
 
@@ -51,22 +53,24 @@ public class PostBardAPI {
                     .build();
 
             // 요청 전송
-            Response response = client.newCall(request).execute();
+            response = client.newCall(request).execute();
             if (response.isSuccessful()) {
                 // 응답 Body
-                ResponseBody body = response.body();
+                body = response.body();
                 if (body != null) {
                     result = body.string();
+                    body.close();
                 }
-            } else
+            } else {
                 throw new BaseException(BaseResponseStatus.BAD_REQUEST);
-
+            }
         } catch (Exception e) {
             throw new BaseException(BaseResponseStatus.BAD_REQUEST);
         } finally {
-            if (result == null){
+            if (result == null) {
                 throw new BaseException(BaseResponseStatus.BAD_REQUEST);
             }
+
             return result;
         }
     }
