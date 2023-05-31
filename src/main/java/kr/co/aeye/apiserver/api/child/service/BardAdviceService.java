@@ -9,6 +9,9 @@ import kr.co.aeye.apiserver.common.BaseException;
 import kr.co.aeye.apiserver.common.BaseResponseStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -26,7 +29,9 @@ import static kr.co.aeye.apiserver.common.BaseResponseStatus.SERVER_ERROR;
 @Service
 @RequiredArgsConstructor
 public class BardAdviceService {
-    @Value("${bard.api-key}") String apiKey;
+//    I have used the Chat GPT API as the Bad API has been discontinued as of May 31st.
+//    @Value("${bard.api-key}") String apiKey;
+    @Value("${chatGpt.api-key}") String apiKey;
 
     public List<SolutionObjectDto> postAdviceToBard(PostAdviceBardReq postAdviceBardReq) throws BaseException, MalformedURLException, ProtocolException, ParseException, JsonProcessingException {
         PostBardAPI postBardAPI = new PostBardAPI(apiKey);
@@ -45,10 +50,17 @@ public class BardAdviceService {
         return solutionList;
     }
 
-    public String extractJsonFormInString(String text) throws BaseException {
+    public String extractJsonFormInString(String text) throws BaseException, ParseException {
+        JSONParser parser = new JSONParser();
+        JSONObject jsonObject = (JSONObject) parser.parse(text);
+
+        JSONArray choices = (JSONArray) jsonObject.get("choices");
+        JSONObject choice = (JSONObject) choices.get(0);
+        String result = String.valueOf(choice.get("text"));
+
         String jsonPattern = "(?s)```json\\s*(.*?)\\s*```";
         Pattern pattern = Pattern.compile(jsonPattern);
-        Matcher matcher = pattern.matcher(text);
+        Matcher matcher = pattern.matcher(result);
         String jsonContent;
 
         if (matcher.find()) {
