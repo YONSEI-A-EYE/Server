@@ -30,7 +30,8 @@ public class PostBardAPI {
                 "%s is %d years old. %s has %s. %s. " +
                         "What can I do? " +
                         "Show me 5 solutions and each solution has index, title and content. " +
-                        "Response should be only json format which consist of solution object list.",
+                        "Response should be only json format which consist of solution object list." +
+                        "Wrap the JSON with ```json and ```",
                 childName, childAge, childName, childTemperament, content);
 
         JSONObject postData = new JSONObject();
