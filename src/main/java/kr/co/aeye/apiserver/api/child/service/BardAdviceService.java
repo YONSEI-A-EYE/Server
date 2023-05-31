@@ -26,7 +26,9 @@ import static kr.co.aeye.apiserver.common.BaseResponseStatus.SERVER_ERROR;
 @Service
 @RequiredArgsConstructor
 public class BardAdviceService {
-    @Value("${bard.api-key}") String apiKey;
+//    I have used the Chat GPT API as the Bad API has been discontinued as of May 31st.
+//    @Value("${bard.api-key}") String apiKey;
+    @Value("${chatGpt.api-key}") String apiKey;
 
     public List<SolutionObjectDto> postAdviceToBard(PostAdviceBardReq postAdviceBardReq) throws BaseException, MalformedURLException, ProtocolException, ParseException, JsonProcessingException {
         PostBardAPI postBardAPI = new PostBardAPI(apiKey);
