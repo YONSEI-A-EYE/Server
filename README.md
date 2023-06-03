@@ -37,6 +37,7 @@ chatGpt:
 
 -----------
 ## ISSUE
-I thought I was using the official Bard API, but I realized that it was an unauthorized API. 
-I realized this at the last minute, so I had to quickly change it to OpenAI.
-If you can provide me with the Bard API, I can change it back to that API.
+We were using Bard API(https://www.bardapi.dev/app, https://www.ai2api.dev/) believing that it was the official one. 
+However, we found that it was an unauthorized API. 
+We realized this at the last minute, so we had no choice but to implement OpenAI API all of a sudden. 
+If Google release official API, we want to switch to Bard API.
