@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class PostBardAPI {
     /**
-     *   I have used the Chat GPT API as the Bad API has been discontinued as of May 31st.
+     *   I wanted to use the Bard API, but it was not available, so I used OpenAI.
      */
     @NonNull private String apiKey;
 //    private String url = "https://api.bardapi.dev/chat";
