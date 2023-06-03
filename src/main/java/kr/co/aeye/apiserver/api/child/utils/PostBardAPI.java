@@ -17,7 +17,6 @@ public class PostBardAPI {
      *   I wanted to use the Bard API, but it was not available, so I used OpenAI.
      */
     @NonNull private String apiKey;
-//    private String url = "https://api.bardapi.dev/chat";
     private String url = "https://api.openai.com/v1/completions";
 
     public String setPostBody(PostAdviceBardReq postAdviceBardReq){
