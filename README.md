@@ -29,6 +29,8 @@ jwt:
     access-token-expire-time: <access token expire time>
     refresh-token-expire-time: <access token expire time>
 
+chatGpt:
+  api-key: <chat gpt api key>
 ````
 
 ### 3. build and run application
